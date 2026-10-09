@@ -4,7 +4,6 @@
     <LangVersion>12</LangVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GameManaged Condition="'$(GameManaged)' == ''">C:/Games/Sea_Power_8_3/Sea Power_Data/Managed</GameManaged>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="LaunchCandidate.cs" />

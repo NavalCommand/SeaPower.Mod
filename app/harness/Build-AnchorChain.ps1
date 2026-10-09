@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$WorkDirectory,
-    [string]$GameRoot='C:\Games\Sea_Power_8_3'
+    [Parameter(Mandatory)][string]$GameRoot
 )
 $ErrorActionPreference='Stop'
 # Source build only: does not install/activate anything. Approved BepInEx references required.

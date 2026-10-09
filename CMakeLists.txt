@@ -1,17 +1,17 @@
 cmake_minimum_required(VERSION 4.2)
+cmake_policy(SET CMP0168 NEW)
 project(SeaPower.Mod VERSION 0.1.0 LANGUAGES CXX)
-include(cmake/Modules.cmake)
-include(cmake/Common.cmake)
-nc_dependency(Gateway.Api)
-nc_dependency(Gateway.Grpc.Api)
-nc_dependency(Gateway.Grpc)
-add_library(SeaPower.Host SHARED native/Host.cpp)
-target_link_libraries(SeaPower.Host PRIVATE Gateway.Grpc)
-if(PROJECT_IS_TOP_LEVEL)
- enable_testing()
- add_executable(host-tests native/HostTest.cpp)
- target_include_directories(host-tests PRIVATE native)
- target_link_libraries(host-tests PRIVATE SeaPower.Host Gateway.Grpc.Api GTest::gtest_main)
- add_test(NAME host-abi COMMAND host-tests)
-endif()
 
+include(FetchContent)
+FetchContent_Declare(ncbuild
+  GIT_REPOSITORY https://github.com/NavalCommand/Build.CMake.git
+  GIT_TAG main)
+FetchContent_MakeAvailable(ncbuild)
+include("${ncbuild_SOURCE_DIR}/NavalCommand.Build.CMake.cmake")
+
+NavalCommandAddDependency(https://github.com/NavalCommand/Gateway.Api.git main)
+NavalCommandAddDependency(https://github.com/NavalCommand/Gateway.Grpc.Api.git main)
+NavalCommandAddDependency(https://github.com/NavalCommand/Gateway.Grpc.git main)
+NavalCommandAddDependency(https://github.com/NavalCommand/SeaPower.Client.git main)
+
+NavalCommandConfigureModule()

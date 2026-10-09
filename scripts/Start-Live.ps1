@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$OutputDirectory,
- [string]$GameRoot='C:/Games/Sea_Power_8_3',
+ [Parameter(Mandatory)][string]$GameRoot,
  [string]$Package=(Join-Path (Split-Path $PSScriptRoot) 'out/package/0.1.0'),
  [Parameter(Mandatory)][string]$Cli,
  [string]$Scenario=(Join-Path (Split-Path $PSScriptRoot) 'app/harness/MinimalCombat.ini'),

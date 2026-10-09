@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory)][string]$Scenario,
     [Parameter(Mandatory)][string]$Side,
     [Parameter(Mandatory)][string]$OutputDirectory,
-    [string]$GameRoot = 'C:\Games\Sea_Power_8_3'
+    [Parameter(Mandatory)][string]$GameRoot
 )
 $ErrorActionPreference = 'Stop'
 # Offline preparation only. Does not install a loader, start a game, or alter settings.
