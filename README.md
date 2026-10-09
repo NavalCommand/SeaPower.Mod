@@ -1,5 +1,8 @@
 # SeaPower.Mod 0.1.0
 
+Project-wide documentation is maintained in the separate **Docs Git repository**. Before changing this module, explicitly read [Docs/AGENTS.md](../Docs/AGENTS.md), [architecture](../Docs/ARCHITECTURE.md), [module/build policy](../Docs/MODULE_STRUCTURE.md), [local sources](../Docs/LOCAL_SOURCES.md), and [code style](../Docs/CODE_STYLE.md) with its [owner export](../Docs/CodeStyle.xml). The shared instructions are not discovered automatically across repository boundaries; do not create a competing AGENTS.md in the parent workspace. Historical reports and reproduction guides are indexed under [Docs/Tasks/](../Docs/Tasks/README.md), with run receipts under [Docs/Evidence/](../Docs/Evidence/README.md).
+
+
 Sole composition root; runtime code, C ABI revision 1, provider/gateway separation, loopback configuration, bounded immutable queues and approved test harness remain unchanged from Task 004. Native host production target is defined in src/; private namespace-mirrored Host.cpp/.h live there. ABI tests live in test/ and append the host output directory only to their test loader search path.
 
 scripts/Build.ps1 -GameRoot ACTUAL_INSTALL -CMake cmake [-BuildCMakeSource ACTUAL_CHECKOUT] composes/builds/tests the native modules, consumes CMake-generated managed-paths.json for the canonical API/provider sources, compiles managed root/harness and packages out/package/0.1.0. There is no second managed Git resolver or hardcoded module URL substitution. Set game references in ignored Build.Local.cmake for independent adapter builds. No proprietary files or platform Span DLLs are packaged; existing Unity platform shims are used read-only.
@@ -8,7 +11,7 @@ scripts/Start-Live.ps1 -GameRoot ACTUAL_INSTALL -OutputDirectory NEW_DIR -Cli AC
 
 Native crashes can terminate the game. Mission unload clears handles/queues and the process-lifetime server accepts a new session. Never unload a running gRPC DLL. No worker join in Unity callbacks; graceful game exit remains the Task 004 validation gap. No new AirOps, gateway or gameplay capability is introduced.
 
-## Build structure (Task 005)
+## Build structure
 
 Root CMakeLists.txt initializes/composes only. Shared policy/resolution lives in the independent Build.CMake repository, fetched as ncbuild. Production libraries are defined in src/, mocks in mock/, tests in test/, applications in app/. Namespace paths and existing target names are preserved.
 
@@ -20,6 +23,8 @@ cmake --build o/windows-msvc-release --parallel 8
 ctest --test-dir o/windows-msvc-release --output-on-failure --no-tests=error
 ```
 
-The bootstrap option is unnecessary once Build.CMake is available at its declared Git URL. Optional ignored Build.Local.cmake registers canonical module URLs with NavalCommandSetDependencyPath(URL, absoluteCheckout); it is read once at the top level before declaration and applies transitively. Without a registration the declared Git URL and main reference are used. There is no workspace-root environment variable or implicit sibling lookup. External dependencies remain source-built vcpkg manifest packages. An already provisioned prefix can use standard -DVCPKG_INSTALLED_DIR=... -DVCPKG_MANIFEST_INSTALL=OFF cache options. See the parent project's Docs/MODULE_STRUCTURE.md for exact verified commands and limits.
+The bootstrap option is unnecessary once Build.CMake is available at its declared Git URL. Optional ignored Build.Local.cmake registers canonical module URLs with NavalCommandSetDependencyPath(URL, absoluteCheckout); it is read once at the top level before declaration and applies transitively. Without a registration the declared Git URL and main reference are used. There is no workspace-root environment variable or implicit sibling lookup. External dependencies remain source-built vcpkg manifest packages. An already provisioned prefix can use standard -DVCPKG_INSTALLED_DIR=... -DVCPKG_MANIFEST_INSTALL=OFF cache options. See the separate [Docs repository build policy](../Docs/MODULE_STRUCTURE.md) for current commands and limits; dated measurements belong to the [task archive](../Docs/Tasks/README.md).
 
 Presets contain configurePresets only, windows-msvc-debug/release and linux-clang-debug/release where applicable. Output is o/${presetName}. C++26 policy is centralized; MSVC uses /std:c++latest for available features. No full C++26 conformance claim. Build outputs, Build.Local.cmake and CMakeUserPresets.json are ignored. No proprietary game binaries are included.
+
+Windows target and host dependencies use `x64-windows-static`, matching `/MT` in Release and `/MTd` in Debug. Reconfigure with `--fresh` and relink when migrating earlier dynamic-CRT artifacts.

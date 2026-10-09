@@ -7,9 +7,14 @@ using SeaPower;
 using UnityEngine.SceneManagement;
 
 namespace NavalCommand.Task002;
+
 [BepInPlugin("dev.navalcommand.task002", "Task002 Runtime Validation", "0.0.1")]
 public sealed class RuntimePlugin : BaseUnityPlugin
 {
+    private const int MaximumEvidenceMessages = 128;
+    private const int WriterPollMilliseconds = 25;
+    private const int MissionSceneBuildIndex = 2;
+    private const double ReloadAfterOperationalSeconds = 15;
     private sealed class WriterState
     {
         public readonly ConcurrentQueue<string> Queue = new();
@@ -53,7 +58,7 @@ public sealed class RuntimePlugin : BaseUnityPlugin
         var plainState = writerState;
         var plainQueue = plainState.Queue;
         var token = System.Environment.GetEnvironmentVariable("NC_TASK002_TOKEN") ?? "";
-        var pid = System.Diagnostics.Process.GetCurrentProcess().Id;
+        var processId = System.Diagnostics.Process.GetCurrentProcess().Id;
         var compositionEnabled = System.Environment.GetEnvironmentVariable("NC_TASK004_ENABLED") == "1";
         var compositionPath = System.Environment.GetEnvironmentVariable("NC_TASK004_MOD_ASSEMBLY");
         var platformDirectory = Path.GetDirectoryName(typeof(GameMain).Assembly.Location);
@@ -121,21 +126,22 @@ public sealed class RuntimePlugin : BaseUnityPlugin
 
                         if (line.Contains(" playable-ready ") && Guid.TryParse(token, out _))
                         {
-                            File.WriteAllText(Path.Combine(directory, "ready.json"), "{\"ready\":true,\"token\":\"" + token + "\",\"pid\":" + pid + "}");
+                            File.WriteAllText(Path.Combine(directory, "ready.json"), "{\"ready\":true,\"token\":\"" + token + "\",\"pid\":" + processId + "}");
                         }
                     }
 
                     log.Flush();
                     privileged.Flush();
-                    Thread.Sleep(25);
+                    Thread.Sleep(WriterPollMilliseconds);
                 }
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
                 plainState.Failed = true;
                 try
                 {
-                    File.WriteAllText(Path.Combine(directory, "evidence-error.json"), "{\"error\":\"writer-failed\",\"type\":\"" + e.GetType().Name + "\"}");
+                    File.WriteAllText(Path.Combine(directory, "evidence-error.json"), "{\"error\":\"writer-failed\",\"type\":\""
+                        + exception.GetType().Name + "\"}");
                 }
                 catch
                 { /* No marker can be created; external timeout still cannot pass. */
@@ -153,7 +159,7 @@ public sealed class RuntimePlugin : BaseUnityPlugin
 
     private void Emit(string value)
     {
-        if (writerState.Queue.Count < 128)
+        if (writerState.Queue.Count < MaximumEvidenceMessages)
         {
             writerState.Queue.Enqueue(DateTime.UtcNow.ToString("o") + " " + value);
         }
@@ -203,9 +209,9 @@ public sealed class RuntimePlugin : BaseUnityPlugin
                     assembly.GetType("NavalCommand.SeaPower.Mod.Bootstrap").GetMethod("Attach").Invoke(null, null);
                     Emit("task004-composition-attached");
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
-                    Emit("task004-bootstrap-failed " + e);
+                    Emit("task004-bootstrap-failed " + exception);
                 }
             }
 
@@ -229,9 +235,9 @@ public sealed class RuntimePlugin : BaseUnityPlugin
                 {
                     candidate = LaunchCandidate.Install(mission, side);
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
-                    Emit("install-failed " + e);
+                    Emit("install-failed " + exception);
                 }
             }
         }
@@ -254,14 +260,16 @@ public sealed class RuntimePlugin : BaseUnityPlugin
             AirOpsProbe.Update();
         }
 
-        if (System.Environment.GetEnvironmentVariable("NC_TASK004_RELOAD_TEST") == "1" && !reloadRequested && GameTime.missionElapsedTime > 15 && Singleton<GameMain>.InstanceExists() && Singleton<GameMain>.Instance._initialized)
+        if (System.Environment.GetEnvironmentVariable("NC_TASK004_RELOAD_TEST") == "1" && !reloadRequested
+            && GameTime.missionElapsedTime > ReloadAfterOperationalSeconds && Singleton<GameMain>.InstanceExists() && Singleton<GameMain>.Instance._initialized)
         {
             reloadRequested = true;
             Emit("task004-native-unload-reload-requested");
             Singleton<MissionManager>.Instance.UnloadMissionAndReload();
         }
 
-        if (diagnostics && lifecycleTest && !reloadRequested && GameTime.missionElapsedTime > 15 && Singleton<GameMain>.InstanceExists() && Singleton<GameMain>.Instance._initialized)
+        if (diagnostics && lifecycleTest && !reloadRequested && GameTime.missionElapsedTime > ReloadAfterOperationalSeconds
+            && Singleton<GameMain>.InstanceExists() && Singleton<GameMain>.Instance._initialized)
         {
             reloadRequested = true;
             DiagnosticProbe.PrepareOwnedUnload();
@@ -278,12 +286,12 @@ public sealed class RuntimePlugin : BaseUnityPlugin
     private void SceneUnloaded(Scene scene)
     {
         Emit("scene-unloaded buildIndex=" + scene.buildIndex + " thread=" + Thread.CurrentThread.ManagedThreadId);
-        if (scene.buildIndex == 2 && diagnostics)
+        if (scene.buildIndex == MissionSceneBuildIndex && diagnostics)
         {
             DiagnosticProbe.InvalidateScene();
         }
 
-        if (scene.buildIndex == 2 && airOps)
+        if (scene.buildIndex == MissionSceneBuildIndex && airOps)
         {
             AirOpsProbe.Remove();
         }

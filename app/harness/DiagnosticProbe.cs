@@ -9,12 +9,25 @@ namespace NavalCommand.Task002;
 // Disposable scripted experiment; not an API. All callbacks below run on Unity's thread.
 public static class DiagnosticProbe
 {
+    private const double FirstSampleOperationalSeconds = 8;
+    private const double SampleIntervalOperationalSeconds = 5;
+    private const double AiRequestAfterOperationalSeconds = 15;
+    private const double FirstPauseExperimentOperationalSeconds = 65;
+    private const double SecondPauseExperimentOperationalSeconds = 70;
+    private const double WaypointLatitudeOffsetDegrees = 0.03;
+    private const float OwnedPauseDurationWallSeconds = 1;
+    private const int FirstForeignContactId = 7001;
+    private const int WaypointTelegraphSetting = 2;
+    private const int CompletedPauseStage = 9;
     private static Action<string> emit;
     private static Harmony harmony;
     private static double nextSample;
-    private static GoToWaypointTask playerTask, aiTask;
-    private static bool playerIssued, aiIssued;
-    private static GeoPosition playerOrigin, aiOrigin;
+    private static GoToWaypointTask playerTask;
+    private static GoToWaypointTask aiTask;
+    private static bool playerIssued;
+    private static bool aiIssued;
+    private static GeoPosition playerOrigin;
+    private static GeoPosition aiOrigin;
     private static long pauseRevision;
     private static long leaseRevision;
     private static bool adapterIntent;
@@ -28,10 +41,13 @@ public static class DiagnosticProbe
         emit = sink;
         observationOnly = System.Environment.GetEnvironmentVariable("NC_TASK002_OBSERVE_ONLY") == "1";
         harmony = new Harmony("dev.navalcommand.task002.diagnostics");
-        harmony.Patch(typeof(JobPerformer).GetMethod(nameof(JobPerformer.CompleteFixedUpdateJobs)), postfix: new HarmonyMethod(typeof(DiagnosticProbe).GetMethod(nameof(AfterJobs))));
+        harmony.Patch(typeof(JobPerformer).GetMethod(nameof(JobPerformer.CompleteFixedUpdateJobs)),
+            postfix: new HarmonyMethod(typeof(DiagnosticProbe).GetMethod(nameof(AfterJobs))));
         harmony.Patch(typeof(GameTime).GetMethod(nameof(GameTime.Pause)), prefix: new HarmonyMethod(typeof(DiagnosticProbe).GetMethod(nameof(PauseIntent))));
-        harmony.Patch(typeof(AircraftStates.AdvancedMissileEvasion).GetMethod("onEnter"), postfix: new HarmonyMethod(typeof(DiagnosticProbe).GetMethod(nameof(EvasionEnter))));
-        harmony.Patch(typeof(AircraftStates.AdvancedMissileEvasion).GetMethod("onExit"), postfix: new HarmonyMethod(typeof(DiagnosticProbe).GetMethod(nameof(EvasionExit))));
+        harmony.Patch(typeof(AircraftStates.AdvancedMissileEvasion).GetMethod("onEnter"),
+            postfix: new HarmonyMethod(typeof(DiagnosticProbe).GetMethod(nameof(EvasionEnter))));
+        harmony.Patch(typeof(AircraftStates.AdvancedMissileEvasion).GetMethod("onExit"),
+            postfix: new HarmonyMethod(typeof(DiagnosticProbe).GetMethod(nameof(EvasionExit))));
         emit("diagnostics-installed mainThread=" + Thread.CurrentThread.ManagedThreadId);
     }
 
@@ -55,26 +71,30 @@ public static class DiagnosticProbe
             return;
         }
 
-        if (!Singleton<GameMain>.InstanceExists() || !Singleton<GameMain>.Instance._initialized || Singleton<GameMain>.Instance._closing || !Singleton<LoadScreen>.InstanceExists() || Singleton<LoadScreen>.Instance.cameraObject.enabled || Globals._playerTaskforce == null || Globals._enemyTaskforce == null)
+        if (!Singleton<GameMain>.InstanceExists() || !Singleton<GameMain>.Instance._initialized || Singleton<GameMain>.Instance._closing
+            || !Singleton<LoadScreen>.InstanceExists() || Singleton<LoadScreen>.Instance.cameraObject.enabled || Globals._playerTaskforce == null
+            || Globals._enemyTaskforce == null)
         {
             return;
         }
 
         double time = GameTime.missionElapsedTime;
-        if (time < 8 || time < nextSample)
+        if (time < FirstSampleOperationalSeconds || time < nextSample)
         {
             return;
         }
 
-        nextSample = time + 5;
-        emit("safe-sample thread=" + Thread.CurrentThread.ManagedThreadId + " tick=" + GameTime.simulationTick + " objectJobsComplete=true collisionJobsComplete=true missionTime=" + time);
+        nextSample = time + SampleIntervalOperationalSeconds;
+        emit("safe-sample thread=" + Thread.CurrentThread.ManagedThreadId + " tick=" + GameTime.simulationTick
+            + " objectJobsComplete=true collisionJobsComplete=true missionTime=" + time);
         Observe(Globals._playerTaskforce, "player");
         Observe(Globals._enemyTaskforce, "ai");
         foreach (var own in Globals._playerTaskforce._taskforceUnits)
         {
             if (own is Aircraft)
             {
-                emit("own-aircraft state=" + own.StateMachine.CurrentState.GetType().Name + " routeCount=" + own._userRoot.TaskViewModels.Count + " speedKnots=" + own._velocityInKnots + " desiredAltitudeNative=" + own.DesiredAltitude.Value);
+                emit("own-aircraft state=" + own.StateMachine.CurrentState.GetType().Name + " routeCount=" + own._userRoot.TaskViewModels.Count
+                    + " speedKnots=" + own._velocityInKnots + " desiredAltitudeNative=" + own.DesiredAltitude.Value);
             }
         }
 
@@ -84,8 +104,8 @@ public static class DiagnosticProbe
         }
 
         var player = Globals._playerTaskforce._taskforceUnits.FirstOrDefault();
-        var ai = Globals._enemyTaskforce._taskforceUnits.FirstOrDefault();
-        if (player == null || ai == null)
+        var aiUnit = Globals._enemyTaskforce._taskforceUnits.FirstOrDefault();
+        if (player == null || aiUnit == null)
         {
             return;
         }
@@ -96,11 +116,12 @@ public static class DiagnosticProbe
             playerTask = Issue(player, "player");
             playerIssued = true;
         }
-        else if (!aiIssued && time > 15)
+        else if (!aiIssued && time > AiRequestAfterOperationalSeconds)
         {
-            aiOrigin = ai._geoPosition;
-            emit("PRIVILEGED ai-control IsPlayerObject=" + ai.IsPlayerObject + " HasControl=" + ai.HasControl + " AcceptsOrdersFromAI=" + ai.AcceptsOrdersFromAI + " AIPlayerForcedDisable=" + AIPlayer.IsForcedToDisable);
-            aiTask = Issue(ai, "ai");
+            aiOrigin = aiUnit._geoPosition;
+            emit("PRIVILEGED ai-control IsPlayerObject=" + aiUnit.IsPlayerObject + " HasControl=" + aiUnit.HasControl + " AcceptsOrdersFromAI="
+                + aiUnit.AcceptsOrdersFromAI + " AIPlayerForcedDisable=" + AIPlayer.IsForcedToDisable);
+            aiTask = Issue(aiUnit, "ai");
             aiIssued = true;
         }
 
@@ -111,23 +132,26 @@ public static class DiagnosticProbe
 
         if (aiTask != null)
         {
-            ReportOrder(ai, aiTask, aiOrigin, "ai");
+            ReportOrder(aiUnit, aiTask, aiOrigin, "ai");
         }
     }
 
     private static void Observe(Taskforce faction, string label)
     {
         // Id is a side-local plotting-table key, never an ObjectBase UID. Export opaque indices.
-        var contacts = faction.PlottingTable.Vehicles.Where(v => v.Id >= 7001).ToArray();
+        var contacts = faction.PlottingTable.Vehicles.Where(contact => contact.Id >= FirstForeignContactId).ToArray();
         emit("OBS side=" + label + " foreignTracks=" + contacts.Length);
         int index = 0;
         foreach (var contact in contacts)
         {
             var estimate = contact.DetectedPosition;
-            emit("OBS side=" + label + " opaque=track-" + (++index) + " estimatePresent=" + estimate.HasValue + " cachedUpdateEpoch=" + contact.UpdateEpoch + " observedMissionTime=" + GameTime.missionElapsedTime + (estimate.HasValue ? " detectedLatitude=" + estimate.Value.Item1.Latitude + " detectedLongitude=" + estimate.Value.Item1.Longitude + " majorStdDevNative=" + estimate.Value.Item2.MajorStdDev + " minorStdDevNative=" + estimate.Value.Item2.MinorStdDev : ""));
+            emit("OBS side=" + label + " opaque=track-" + (++index) + " estimatePresent=" + estimate.HasValue + " cachedUpdateEpoch="
+                + contact.UpdateEpoch + " observedMissionTime=" + GameTime.missionElapsedTime + (estimate.HasValue ? " detectedLatitude="
+                + estimate.Value.Item1.Latitude + " detectedLongitude=" + estimate.Value.Item1.Longitude + " majorStdDevNative="
+                + estimate.Value.Item2.MajorStdDev + " minorStdDevNative=" + estimate.Value.Item2.MinorStdDev : ""));
         }
-    // No BaseObject, UnitTaskforce, name, UID, Velocity, Position fallback or destruction getter.
-    // Snapshot is cached managed estimates; not an atomic ECS/sensor snapshot.
+        // No BaseObject, UnitTaskforce, name, UID, Velocity, Position fallback or destruction getter.
+        // Snapshot is cached managed estimates; not an atomic ECS/sensor snapshot.
     }
 
     private static GoToWaypointTask Issue(ObjectBase unit, string label)
@@ -138,11 +162,18 @@ public static class DiagnosticProbe
             return null;
         }
 
-        var pos = unit._geoPosition;
-        var task = unit.SetWaypointTask(new WaypointData { _geoposition = new GeoPosition(pos.Latitude + 0.03, pos.Longitude, pos._height), _heightState = WaypointData.WaypointHeightState.Current, _setTelegraph = 2, _allowFormationManeuver = false, wpName = "Task002-" + label });
+        var position = unit._geoPosition;
+        var task = unit.SetWaypointTask(new WaypointData
+        {
+            _geoposition = new GeoPosition(position.Latitude + WaypointLatitudeOffsetDegrees, position.Longitude, position._height),
+            _heightState = WaypointData.WaypointHeightState.Current,
+            _setTelegraph = WaypointTelegraphSetting,
+            _allowFormationManeuver = false,
+            wpName = "Task002-" + label
+        });
         task.ReachedWaypoint += (_, _) => emit("order-reached role=" + label);
         task.RemovedOrFinished += (_, _) => emit("order-removed-or-finished role=" + label);
-        emit("command-accepted role=" + label + " taskInserted=" + unit._userRoot.TaskViewModels.Any(v => v.Task == task));
+        emit("command-accepted role=" + label + " taskInserted=" + unit._userRoot.TaskViewModels.Any(contact => contact.Task == task));
         return task;
     }
 
@@ -155,7 +186,8 @@ public static class DiagnosticProbe
             return;
         }
 
-        emit("INCIDENT own-evasion-enter time=" + GameTime.missionElapsedTime + " routeCount=" + aircraft._userRoot.TaskViewModels.Count + " speedKnots=" + aircraft._velocityInKnots + " desiredAltitudeNative=" + aircraft.DesiredAltitude.Value);
+        emit("INCIDENT own-evasion-enter time=" + GameTime.missionElapsedTime + " routeCount=" + aircraft._userRoot.TaskViewModels.Count
+            + " speedKnots=" + aircraft._velocityInKnots + " desiredAltitudeNative=" + aircraft.DesiredAltitude.Value);
         if (System.Environment.GetEnvironmentVariable("NC_TASK002_INTERFERE") == "1")
         {
             aircraft.CeaseFire();
@@ -176,20 +208,23 @@ public static class DiagnosticProbe
             return;
         }
 
-        emit("INCIDENT own-evasion-exit time=" + GameTime.missionElapsedTime + " routeCount=" + __instance._aircraft._userRoot.TaskViewModels.Count + " desiredAltitudeNative=" + __instance._aircraft.DesiredAltitude.Value);
+        emit("INCIDENT own-evasion-exit time=" + GameTime.missionElapsedTime + " routeCount=" + __instance._aircraft._userRoot.TaskViewModels.Count
+            + " desiredAltitudeNative=" + __instance._aircraft.DesiredAltitude.Value);
     }
 
     private static void ReportOrder(ObjectBase unit, GoToWaypointTask task, GeoPosition origin, string label)
     {
-        bool present = unit._userRoot.TaskViewModels.Any(v => v.Task == task);
+        bool present = unit._userRoot.TaskViewModels.Any(contact => contact.Task == task);
         double distance = origin.GetDistance(unit._geoPosition);
-        emit((label == "ai" ? "PRIVILEGED " : "") + "order-progress role=" + label + " retained=" + present + " distanceNative=" + distance + " telegraph=" + unit.getTelegraph() + " state=" + unit.StateMachine.CurrentState.GetType().Name);
+        emit((label == "ai" ? "PRIVILEGED " : "") + "order-progress role=" + label + " retained=" + present + " distanceNative=" + distance
+            + " telegraph=" + unit.getTelegraph() + " state=" + unit.StateMachine.CurrentState.GetType().Name);
     }
 
     // Update is deliberately the paused-mode path; never calls FixedUpdate or job completion.
     public static void UpdatePauseExperiment()
     {
-        if (!aiIssued || GameTime.missionElapsedTime < 65 || !Singleton<GameMain>.InstanceExists() || !Singleton<GameMain>.Instance._initialized || Singleton<GameMain>.Instance._closing)
+        if (!aiIssued || GameTime.missionElapsedTime < FirstPauseExperimentOperationalSeconds || !Singleton<GameMain>.InstanceExists()
+            || !Singleton<GameMain>.Instance._initialized || Singleton<GameMain>.Instance._closing)
         {
             return;
         }
@@ -199,7 +234,7 @@ public static class DiagnosticProbe
             if (GameTime.IsPaused())
             {
                 emit("pause-acquire-refused already-paused");
-                pauseStage = 9;
+                pauseStage = CompletedPauseStage;
                 return;
             }
 
@@ -218,7 +253,7 @@ public static class DiagnosticProbe
             emit("pause-owned nativeTick=" + pauseTick + " revision=" + leaseRevision);
             pauseStage = 1;
         }
-        else if (pauseStage == 1 && Time.realtimeSinceStartup > pauseWall + 1)
+        else if (pauseStage == 1 && Time.realtimeSinceStartup > pauseWall + OwnedPauseDurationWallSeconds)
         {
             emit("paused-dispatch-check tickUnchanged=" + (pauseTick == GameTime.simulationTick) + " stillPaused=" + GameTime.IsPaused());
             if (leaseRevision == pauseRevision)
@@ -229,7 +264,7 @@ public static class DiagnosticProbe
 
             pauseStage = 2;
         }
-        else if (pauseStage == 2 && GameTime.missionElapsedTime > 70)
+        else if (pauseStage == 2 && GameTime.missionElapsedTime > SecondPauseExperimentOperationalSeconds)
         {
             adapterIntent = true;
             GameTime.Pause();
@@ -248,7 +283,7 @@ public static class DiagnosticProbe
                 emit("pause-acquire-refused already-paused");
             }
 
-            pauseStage = 9;
+            pauseStage = CompletedPauseStage;
         }
     }
 

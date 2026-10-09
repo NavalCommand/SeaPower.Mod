@@ -10,6 +10,16 @@ namespace NavalCommand.Task002;
 // Disposable Task003 script, not an operational API or general command dispatcher.
 public static class AirOpsProbe
 {
+    private const int MaximumTrackedSorties = 16;
+    private const int MaximumCallerFrames = 12;
+    private const int MaximumFacilitySamples = 8;
+    private const int MaximumVehicleTypeSamples = 12;
+    private const int MaximumDeckTaskSamples = 24;
+    private const double RequestAfterOperationalSeconds = 8;
+    private const double ReturnToBaseDelayOperationalSeconds = 15;
+    private const float SampleIntervalWallSeconds = 0.5f;
+    private const float OwnedPauseDurationWallSeconds = 1;
+    private const int TestTimeCompression = 5;
     private sealed class Sortie
     {
         public ObjectBase Facility;
@@ -20,7 +30,7 @@ public static class AirOpsProbe
     }
 
     private static readonly List<Sortie> sorties = new();
-    private static readonly Dictionary<string, string> last = new();
+    private static readonly Dictionary<string, string> lastSampleByKey = new();
     private static Action<string> emit;
     private static Harmony harmony;
     private static bool requested;
@@ -34,10 +44,11 @@ public static class AirOpsProbe
         requested = false;
         paused = false;
         sorties.Clear();
-        last.Clear();
+        lastSampleByKey.Clear();
         nextSample = 0;
         harmony = new Harmony("dev.navalcommand.task003.airops");
-        harmony.Patch(AccessTools.Method(typeof(FlightDeck), "createLaunchTask"), prefix: new HarmonyMethod(typeof(AirOpsProbe), nameof(LaunchPrefix)), postfix: new HarmonyMethod(typeof(AirOpsProbe), nameof(LaunchPostfix)));
+        harmony.Patch(AccessTools.Method(typeof(FlightDeck), "createLaunchTask"), prefix: new HarmonyMethod(typeof(AirOpsProbe), nameof(LaunchPrefix)),
+            postfix: new HarmonyMethod(typeof(AirOpsProbe), nameof(LaunchPostfix)));
         harmony.Patch(AccessTools.Method(typeof(JobPerformer), "CompleteFixedUpdateJobs"), postfix: new HarmonyMethod(typeof(AirOpsProbe), nameof(AfterJobs)));
         emit("AIROPS installed thread=" + Thread.CurrentThread.ManagedThreadId);
     }
@@ -47,11 +58,11 @@ public static class AirOpsProbe
         harmony?.UnpatchSelf();
         harmony = null;
         sorties.Clear();
-        last.Clear();
+        lastSampleByKey.Clear();
     }
 
     private static bool Main() => Globals.mainThread == Thread.CurrentThread;
-    private static bool Own(ObjectBase o) => o != null && o._taskforce == Globals._playerTaskforce;
+    private static bool Own(ObjectBase nativeUnit) => nativeUnit != null && nativeUnit._taskforce == Globals._playerTaskforce;
     private static void Log(ObjectBase facility, string value)
     {
         if (!Main() || facility == null)
@@ -59,21 +70,24 @@ public static class AirOpsProbe
             return;
         }
 
-        emit((Own(facility) ? "AIROPS " : " PRIVILEGED AIROPS ") + "t=" + GameTime.missionElapsedTime + " thread=" + Thread.CurrentThread.ManagedThreadId + " facility=" + facility.UniqueID + " " + value);
+        emit((Own(facility) ? "AIROPS " : " PRIVILEGED AIROPS ") + "t=" + GameTime.missionElapsedTime + " thread="
+            + Thread.CurrentThread.ManagedThreadId + " facility=" + facility.UniqueID + " " + value);
     }
 
     private static void Changed(ObjectBase facility, string key, string value)
     {
         key = facility.UniqueID + ":" + key;
-        if (!last.TryGetValue(key, out var old) || old != value)
+        if (!lastSampleByKey.TryGetValue(key, out var previousSample) || previousSample != value)
         {
-            last[key] = value;
+            lastSampleByKey[key] = value;
             Log(facility, value);
         }
     }
 
     private static void LaunchPrefix(FlightDeck __instance, VehicleTypeOnBoard vehicle, Loadout loadout, LaunchTaskParameters ltp)
     {
+        // Harmony binds this argument by the native method's parameter name.
+        var launchParameters = ltp;
         if (!Main())
         {
             return;
@@ -81,8 +95,10 @@ public static class AirOpsProbe
 
         // Stack contains method names only. Nonplayer evidence is privileged.
         var stack = new System.Diagnostics.StackTrace().GetFrames();
-        var callers = string.Join(">", (stack ?? Array.Empty<System.Diagnostics.StackFrame>()).Take(12).Select(f => f.GetMethod()?.DeclaringType?.Name + "." + f.GetMethod()?.Name));
-        Log(__instance._baseObject, "request aircraft=" + vehicle?._fileName + " loadout=" + loadout?.Name + " count=" + ltp?._launchCount + " mission=" + ltp?._missionType + " strategicForcedOff=" + AIPlayer.IsForcedToDisable + " deckAiDisabled=" + __instance._aiDisabled + " callers=" + callers);
+        var callers = string.Join(">", (stack ?? Array.Empty<System.Diagnostics.StackFrame>()).Take(MaximumCallerFrames).Select(frame => frame.GetMethod()?.DeclaringType?.Name + "." + frame.GetMethod()?.Name));
+        Log(__instance._baseObject, "request aircraft=" + vehicle?._fileName + " loadout=" + loadout?.Name + " count="
+            + launchParameters?._launchCount + " mission=" + launchParameters?._missionType + " strategicForcedOff=" + AIPlayer.IsForcedToDisable
+            + " deckAiDisabled=" + __instance._aiDisabled + " callers=" + callers);
     }
 
     private static void LaunchPostfix(FlightDeck __instance, PendingLaunchTask __result)
@@ -100,28 +116,35 @@ public static class AirOpsProbe
 
         __result.Launched += (_, unit) =>
         {
-            Log(__instance._baseObject, "spawn-callback task=" + __result._uid + " unit=" + unit?.UniqueID + " inFlight=" + InFlight(unit) + " deckState=" + unit?._flightDeckState);
-            if (Own(__instance._baseObject) && unit != null && sorties.Count < 16)
+            Log(__instance._baseObject, "spawn-callback task=" + __result._uid + " unit=" + unit?.UniqueID + " inFlight=" + InFlight(unit)
+                + " deckState=" + unit?._flightDeckState);
+            if (Own(__instance._baseObject) && unit != null && sorties.Count < MaximumTrackedSorties)
             {
-                sorties.Add(new Sortie { Facility = __instance._baseObject, Unit = unit });
+                sorties.Add(new Sortie
+                {
+                    Facility = __instance._baseObject,
+                    Unit = unit
+                });
             }
         };
     }
 
-    private static bool InFlight(ObjectBase o) => o is Aircraft a ? a._isInFlight : o is Helicopter h && h._isInFlight;
+    private static bool InFlight(ObjectBase nativeUnit) => nativeUnit is Aircraft aircraft ? aircraft._isInFlight : nativeUnit is Helicopter helicopter && helicopter._isInFlight;
     public static void Update() => Step(false);
     public static void AfterJobs() => Step(true);
     private static void Step(bool fromJobHook)
     {
-        if (!Main() || !Singleton<GameMain>.InstanceExists() || !Singleton<GameMain>.Instance._initialized || Singleton<GameMain>.Instance._closing || !Singleton<SceneCreator>.Instance.IsLoadingDone || Singleton<LoadScreen>.Instance.cameraObject.enabled || Globals._playerTaskforce == null)
+        if (!Main() || !Singleton<GameMain>.InstanceExists() || !Singleton<GameMain>.Instance._initialized || Singleton<GameMain>.Instance._closing
+            || !Singleton<SceneCreator>.Instance.IsLoadingDone || Singleton<LoadScreen>.Instance.cameraObject.enabled || Globals._playerTaskforce == null)
         {
             return;
         }
 
-        if ((fromJobHook || GameTime.IsPaused()) && Time.realtimeSinceStartup >= nextSample && ObjectCalculationsJobScheduler.HasPreviousJobCompleted && CollisionAvoidanceJobScheduler.HasPreviousJobCompleted)
+        if ((fromJobHook || GameTime.IsPaused()) && Time.realtimeSinceStartup >= nextSample && ObjectCalculationsJobScheduler.HasPreviousJobCompleted
+            && CollisionAvoidanceJobScheduler.HasPreviousJobCompleted)
         {
-            nextSample = Time.realtimeSinceStartup + 0.5f;
-            foreach (var tf in new[]
+            nextSample = Time.realtimeSinceStartup + SampleIntervalWallSeconds;
+            foreach (var taskforce in new[]
             {
                 Globals._playerTaskforce,
                 Globals._enemyTaskforce
@@ -129,12 +152,13 @@ public static class AirOpsProbe
 
             )
             {
-                if (tf == null)
+                if (taskforce == null)
                 {
                     continue;
                 }
 
-                foreach (var facility in tf._taskforceUnits.Where(o => o != null && o._obp?._flightDeck != null).Take(8).ToArray())
+                foreach (var facility in taskforce._taskforceUnits.Where(nativeUnit => nativeUnit != null
+                    && nativeUnit._obp?._flightDeck != null).Take(MaximumFacilitySamples).ToArray())
                 {
                     Sample(facility);
                 }
@@ -154,14 +178,17 @@ public static class AirOpsProbe
                 }
 
                 var unit = sortie.Unit;
-                Changed(sortie.Facility, "unit-" + unit.UniqueID, "unit=" + unit.UniqueID + " inFlight=" + InFlight(unit) + " deckState=" + unit._flightDeckState + " unitState=" + unit.StateMachine?.CurrentState?.GetType().Name + " order=" + unit.CurrentOrder.Value.OrderType);
+                Changed(sortie.Facility, "unit-" + unit.UniqueID, "unit=" + unit.UniqueID + " inFlight=" + InFlight(unit) + " deckState="
+                    + unit._flightDeckState + " unitState=" + unit.StateMachine?.CurrentState?.GetType().Name + " order=" + unit.CurrentOrder.Value.OrderType);
                 if (InFlight(unit) && string.IsNullOrEmpty(unit._flightDeckState) && sortie.AirborneAt < 0)
                 {
                     sortie.AirborneAt = GameTime.missionElapsedTime;
-                    Log(sortie.Facility, "airborne-confirmed unit=" + unit.UniqueID + " ordinaryMember=" + Globals._playerTaskforce._taskforceUnits.Contains(unit));
+                    Log(sortie.Facility, "airborne-confirmed unit=" + unit.UniqueID + " ordinaryMember="
+                        + Globals._playerTaskforce._taskforceUnits.Contains(unit));
                 }
 
-                if (!sortie.Rtb && sortie.AirborneAt >= 0 && GameTime.missionElapsedTime > sortie.AirborneAt + 15 && Own(unit) && unit.HasControl && !GameTime.IsPaused() && !(unit.StateMachine?.CurrentState is AircraftStates.AdvancedMissileEvasion))
+                if (!sortie.Rtb && sortie.AirborneAt >= 0 && GameTime.missionElapsedTime > sortie.AirborneAt + ReturnToBaseDelayOperationalSeconds
+                    && Own(unit) && unit.HasControl && !GameTime.IsPaused() && !(unit.StateMachine?.CurrentState is AircraftStates.AdvancedMissileEvasion))
                 {
                     sortie.Rtb = true;
                     unit.setOrder(Order.Type.ReturnToBase, sortie.Facility, displayOrderText: false);
@@ -175,20 +202,21 @@ public static class AirOpsProbe
             return;
         }
 
-        if (!requested && GameTime.missionElapsedTime >= 8 && !GameTime.IsPaused())
+        if (!requested && GameTime.missionElapsedTime >= RequestAfterOperationalSeconds && !GameTime.IsPaused())
         {
             requested = true;
             GameTime.Pause();
             paused = true;
             pauseWall = Time.realtimeSinceStartup;
             pauseTick = GameTime.simulationTick;
-            foreach (var facility in Globals._playerTaskforce._taskforceUnits.Where(o => o != null && o._obp?._flightDeck != null).Take(8).ToArray())
+            foreach (var facility in Globals._playerTaskforce._taskforceUnits.Where(nativeUnit => nativeUnit != null
+                && nativeUnit._obp?._flightDeck != null).Take(MaximumFacilitySamples).ToArray())
             {
                 Request(facility);
             }
         }
 
-        if (paused && Time.realtimeSinceStartup > pauseWall + 1)
+        if (paused && Time.realtimeSinceStartup > pauseWall + OwnedPauseDurationWallSeconds)
         {
             emit("AIROPS pause-check unchangedTick=" + (pauseTick == GameTime.simulationTick) + " paused=" + GameTime.IsPaused());
             paused = false;
@@ -196,7 +224,7 @@ public static class AirOpsProbe
             if (GameTime.IsPaused())
             {
                 GameTime.UnPause();
-                GameTime.SetTimeCompression(5);
+                GameTime.SetTimeCompression(TestTimeCompression);
                 emit("AIROPS owned-test-resume compression=" + GameTime.TimeCompression);
             }
         }
@@ -204,50 +232,64 @@ public static class AirOpsProbe
 
     private static void Sample(ObjectBase facility)
     {
-        var d = facility._obp._flightDeck;
-        Changed(facility, "facility", "type=" + facility._obp._objectIniName + " own=" + Own(facility) + " control=" + facility.HasControl + " playerOrders=" + facility.AcceptsOrdersFromPlayer + " deckAiDisabled=" + d._aiDisabled + " inoperable=" + d.Inoperable.Value + " maxCapacity=" + d.MaxAircraftOnBoard + " onboard=" + d.AircraftCurrentlyOnBoard + " readyCount=" + d.TotalVehiclesOnBoard() + " crews=" + d.GroundCrewCount + " deckSlots=" + d.DeckParkSlots + " ammo=" + d._currentAmmo + " taskCount=" + d.FlightDeckTasks.Count + " landingQueue=" + d._landingQueue.Count + " holdingQueue=" + d._holdingQueue.Count + " timingMode=" + Singleton<OptionsManager>.Instance.FlightDeckTimingsMode);
-        foreach (var v in d._vehiclesOnBoard.Where(v => v.Numbers > 0 || d.FlightDeckTasks.Any(t => t.VehicleType == v)).Take(12))
+        var flightDeck = facility._obp._flightDeck;
+        Changed(facility, "facility", "type=" + facility._obp._objectIniName + " own=" + Own(facility) + " control=" + facility.HasControl
+            + " playerOrders=" + facility.AcceptsOrdersFromPlayer + " deckAiDisabled=" + flightDeck._aiDisabled + " inoperable="
+            + flightDeck.Inoperable.Value + " maxCapacity=" + flightDeck.MaxAircraftOnBoard + " onboard=" + flightDeck.AircraftCurrentlyOnBoard
+            + " readyCount=" + flightDeck.TotalVehiclesOnBoard() + " crews=" + flightDeck.GroundCrewCount + " deckSlots=" + flightDeck.DeckParkSlots
+            + " ammo=" + flightDeck._currentAmmo + " taskCount=" + flightDeck.FlightDeckTasks.Count + " landingQueue="
+            + flightDeck._landingQueue.Count + " holdingQueue=" + flightDeck._holdingQueue.Count + " timingMode="
+            + Singleton<OptionsManager>.Instance.FlightDeckTimingsMode);
+        foreach (var vehicleType in flightDeck._vehiclesOnBoard.Where(vehicleType => vehicleType.Numbers > 0
+            || flightDeck.FlightDeckTasks.Any(deckTask => deckTask.VehicleType == vehicleType)).Take(MaximumVehicleTypeSamples))
         {
-            Changed(facility, "inventory-" + v._fileName, "inventory aircraft=" + v._fileName + " numbers=" + v.Numbers + " squads=" + string.Join(",", v.Squadrons.Select(s => s._name + ":" + s.Numbers)));
+            Changed(facility, "inventory-" + vehicleType._fileName, "inventory aircraft=" + vehicleType._fileName + " numbers=" + vehicleType.Numbers
+                + " squads=" + string.Join(",", vehicleType.Squadrons.Select(squadron => squadron._name + ":" + squadron.Numbers)));
         }
 
-        foreach (var task in d.FlightDeckTasks.Take(24))
+        foreach (var task in flightDeck.FlightDeckTasks.Take(MaximumDeckTaskSamples))
         {
-            Changed(facility, "task-" + task._uid, "task=" + task._uid + " kind=" + task.GetType().Name + " state=" + task._stateMachine?.CurrentState?.GetType().Name + " unit=" + task.Vehicle?.UniqueID + " remainingWork=" + Math.Round(task._duration, 1) + " launchAllowed=" + (task is PendingLaunchTask p ? p.launchAllowed.ToString() : "n/a"));
+            Changed(facility, "task-" + task._uid, "task=" + task._uid + " kind=" + task.GetType().Name + " state="
+                + task._stateMachine?.CurrentState?.GetType().Name + " unit=" + task.Vehicle?.UniqueID + " remainingWork=" + Math.Round(task._duration,
+                1) + " launchAllowed=" + (task is PendingLaunchTask pendingLaunchTask ? pendingLaunchTask.launchAllowed.ToString() : "n/a"));
         }
     }
 
     private static void Request(ObjectBase facility)
     {
-        var d = facility._obp._flightDeck;
-        if (!Own(facility) || !facility.HasControl || !facility.AcceptsOrdersFromPlayer || d.Inoperable.Value)
+        var flightDeck = facility._obp._flightDeck;
+        if (!Own(facility) || !facility.HasControl || !facility.AcceptsOrdersFromPlayer || flightDeck.Inoperable.Value)
         {
             Log(facility, "request-rejected authority/inoperable");
             return;
         }
 
-        var v = d._vehiclesOnBoard.FirstOrDefault(v => v.Numbers >= 1 && v.Squadrons.Any(s => s.Numbers >= 1 && s.Callsigns.Count > 0));
-        var squad = v?.Squadrons.FirstOrDefault(s => s.Numbers >= 1 && s.Callsigns.Count > 0);
-        var load = v?.Loadouts.FirstOrDefault(l => d.CanLaunchVehicle(l, 1) && l.Name != "None");
-        if (load == null || squad == null)
+        var vehicleType = flightDeck._vehiclesOnBoard.FirstOrDefault(vehicleType => vehicleType.Numbers >= 1
+            && vehicleType.Squadrons.Any(squadron => squadron.Numbers >= 1 && squadron.Callsigns.Count > 0));
+        var squadron = vehicleType?.Squadrons.FirstOrDefault(squadron => squadron.Numbers >= 1 && squadron.Callsigns.Count > 0);
+        var loadout = vehicleType?.Loadouts.FirstOrDefault(loadout => flightDeck.CanLaunchVehicle(loadout, 1) && loadout.Name != "None");
+        if (loadout == null || squadron == null)
         {
             Log(facility, "request-rejected inventory/loadout");
             return;
         }
 
-        Log(facility, "selected aircraft=" + v._fileName + " loadout=" + load.Name + " nominalReadyWork=" + load._readyUpDuration + " ammoCost=" + load._ammoPoints + " pause=" + GameTime.IsPaused() + " tick=" + GameTime.simulationTick);
-        var before = v.Numbers;
-        var ammoBefore = d._currentAmmo;
-        var cancel = d.createLaunchTask(v, load, squad, squad.Callsigns[0], new LaunchTaskParameters(), allowLaunch: false);
-        if (cancel != null)
+        Log(facility, "selected aircraft=" + vehicleType._fileName + " loadout=" + loadout.Name + " nominalReadyWork=" + loadout._readyUpDuration
+            + " ammoCost=" + loadout._ammoPoints + " pause=" + GameTime.IsPaused() + " tick=" + GameTime.simulationTick);
+        var stockBeforeRequest = vehicleType.Numbers;
+        var ammoBefore = flightDeck._currentAmmo;
+        var cancelledLaunchTask = flightDeck.createLaunchTask(vehicleType, loadout, squadron, squadron.Callsigns[0], new LaunchTaskParameters(),
+            allowLaunch: false);
+        if (cancelledLaunchTask != null)
         {
-            cancel.PrioritiseTaskFunc(null);
-            cancel.ToggleLaunchAllowedFunc(null);
-            cancel.ToggleLaunchAllowedFunc(null);
-            d.abortLaunchTask(cancel._uid);
-            Log(facility, "cancel-check inventoryRestored=" + (v.Numbers == before) + " ammoRestored=" + (d._currentAmmo == ammoBefore));
+            cancelledLaunchTask.PrioritiseTaskFunc(null);
+            cancelledLaunchTask.ToggleLaunchAllowedFunc(null);
+            cancelledLaunchTask.ToggleLaunchAllowedFunc(null);
+            flightDeck.abortLaunchTask(cancelledLaunchTask._uid);
+            Log(facility, "cancel-check inventoryRestored=" + (vehicleType.Numbers == stockBeforeRequest) + " ammoRestored="
+                + (flightDeck._currentAmmo == ammoBefore));
         }
 
-        d.createLaunchTask(v, load, squad, squad.Callsigns[0], new LaunchTaskParameters());
+        flightDeck.createLaunchTask(vehicleType, loadout, squadron, squadron.Callsigns[0], new LaunchTaskParameters());
     }
 }

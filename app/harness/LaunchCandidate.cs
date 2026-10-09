@@ -10,6 +10,12 @@ namespace NavalCommand.Task002;
 // Readiness is deliberately narrow: a native player side, own units, and advancing time.
 public sealed class LaunchCandidate : MonoBehaviour
 {
+    private const float LaunchTimeoutWallSeconds = 180;
+    private const int MaximumEvidencePhases = 32;
+    private const int MenuSceneBuildIndex = 1;
+    private const int MissionSceneBuildIndex = 2;
+    private const float CompleteLoadPercent = 100;
+    private const double ReadinessMissionTimeAdvanceSeconds = 1.0;
     private string mission = "";
     private string side = "";
     private int ownerThread;
@@ -33,7 +39,7 @@ public sealed class LaunchCandidate : MonoBehaviour
             throw new ArgumentException("Explicit mission and native player side required");
         }
 
-        if (SceneManager.GetSceneByBuildIndex(2).isLoaded)
+        if (SceneManager.GetSceneByBuildIndex(MissionSceneBuildIndex).isLoaded)
         {
             throw new InvalidOperationException("Refusing an existing mission");
         }
@@ -44,7 +50,7 @@ public sealed class LaunchCandidate : MonoBehaviour
         probe.mission = missionPath;
         probe.side = nativePlayerSide;
         probe.ownerThread = Thread.CurrentThread.ManagedThreadId;
-        probe.deadline = Time.realtimeSinceStartup + 180f;
+        probe.deadline = Time.realtimeSinceStartup + LaunchTimeoutWallSeconds;
         probe.Emit("adapter-installed-candidate");
         return probe;
     }
@@ -63,7 +69,7 @@ public sealed class LaunchCandidate : MonoBehaviour
 
     private void Emit(string phase)
     {
-        if (Interlocked.Increment(ref queued) <= 32)
+        if (Interlocked.Increment(ref queued) <= MaximumEvidencePhases)
         {
             phases.Enqueue(phase);
         }
@@ -100,12 +106,13 @@ public sealed class LaunchCandidate : MonoBehaviour
             {
                 // Candidate predicate: menu scene plus the native load dependencies.
                 // Must be validated against callbacks before this becomes a supported hook.
-                if (!SceneManager.GetSceneByBuildIndex(1).isLoaded || !Singleton<BackgroundSceneController>.InstanceExists() || !Singleton<LoadScreen>.InstanceExists() || !Singleton<SeapowerUI.ViewModels.MenuSystemViewModel>.InstanceExists())
+                if (!SceneManager.GetSceneByBuildIndex(MenuSceneBuildIndex).isLoaded || !Singleton<BackgroundSceneController>.InstanceExists()
+                    || !Singleton<LoadScreen>.InstanceExists() || !Singleton<SeapowerUI.ViewModels.MenuSystemViewModel>.InstanceExists())
                 {
                     return;
                 }
 
-                if (Singleton<LoadScreen>.Instance.cameraObject.enabled || Singleton<LoadScreen>.Instance.LoadPercent < 100f)
+                if (Singleton<LoadScreen>.Instance.cameraObject.enabled || Singleton<LoadScreen>.Instance.LoadPercent < CompleteLoadPercent)
                 {
                     return;
                 }
@@ -117,7 +124,8 @@ public sealed class LaunchCandidate : MonoBehaviour
                 return;
             }
 
-            if (!SceneManager.GetSceneByBuildIndex(2).isLoaded || !Singleton<SceneCreator>.InstanceExists() || !Singleton<GameMain>.InstanceExists())
+            if (!SceneManager.GetSceneByBuildIndex(MissionSceneBuildIndex).isLoaded || !Singleton<SceneCreator>.InstanceExists()
+                || !Singleton<GameMain>.InstanceExists())
             {
                 return;
             }
@@ -134,7 +142,8 @@ public sealed class LaunchCandidate : MonoBehaviour
                 return;
             }
 
-            if (Singleton<LoadScreen>.Instance.cameraObject.enabled || Singleton<LoadScreen>.Instance.LoadPercent < 100f || Singleton<SceneCreator>.Instance._pauseForBriefing || GameTime.IsPaused())
+            if (Singleton<LoadScreen>.Instance.cameraObject.enabled || Singleton<LoadScreen>.Instance.LoadPercent < CompleteLoadPercent
+                || Singleton<SceneCreator>.Instance._pauseForBriefing || GameTime.IsPaused())
             {
                 return;
             }
@@ -167,18 +176,19 @@ public sealed class LaunchCandidate : MonoBehaviour
                 return;
             }
 
-            if (GameTime.missionElapsedTime < firstMissionTime + 1.0)
+            if (GameTime.missionElapsedTime < firstMissionTime + ReadinessMissionTimeAdvanceSeconds)
             {
                 return;
             }
 
-            Emit("playable-ready side=" + side + " ownUnits=" + Globals._playerTaskforce._taskforceUnits.Count + " controllableOwnUnit=true missionTime=" + GameTime.missionElapsedTime);
+            Emit("playable-ready side=" + side + " ownUnits=" + Globals._playerTaskforce._taskforceUnits.Count
+                + " controllableOwnUnit=true missionTime=" + GameTime.missionElapsedTime);
             // No unit/ECS field reads, briefing dismissal, forced time step or pause release.
             finished = true;
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            Emit("failed-" + e.GetType().Name);
+            Emit("failed-" + exception.GetType().Name);
             finished = true;
         }
     }
