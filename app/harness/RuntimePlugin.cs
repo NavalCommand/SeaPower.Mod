@@ -7,7 +7,6 @@ using SeaPower;
 using UnityEngine.SceneManagement;
 
 namespace NavalCommand.Task002;
-
 [BepInPlugin("dev.navalcommand.task002", "Task002 Runtime Validation", "0.0.1")]
 public sealed class RuntimePlugin : BaseUnityPlugin
 {
@@ -20,6 +19,7 @@ public sealed class RuntimePlugin : BaseUnityPlugin
         public volatile bool CompositionLoaded;
         public System.Reflection.Assembly CompositionAssembly;
     }
+
     private readonly WriterState writerState = new();
     private Thread writer;
     private string mission;
@@ -31,17 +31,25 @@ public sealed class RuntimePlugin : BaseUnityPlugin
     private bool reloadRequested;
     private bool lifecycleTest;
     private bool airOps;
-
     private void Awake()
     {
         active = System.Environment.GetEnvironmentVariable("NC_TASK002_ENABLED") == "1";
-        if (!active) return;
+        if (!active)
+        {
+            return;
+        }
+
         SceneManager.sceneLoaded += SceneLoaded;
         SceneManager.sceneUnloaded += SceneUnloaded;
         var directory = System.Environment.GetEnvironmentVariable("NC_TASK002_RUN_DIR");
         mission = System.Environment.GetEnvironmentVariable("NC_TASK002_SCENARIO");
         side = System.Environment.GetEnvironmentVariable("NC_TASK002_SIDE");
-        if (string.IsNullOrWhiteSpace(directory)) { active = false; return; }
+        if (string.IsNullOrWhiteSpace(directory))
+        {
+            active = false;
+            return;
+        }
+
         var plainState = writerState;
         var plainQueue = plainState.Queue;
         var token = System.Environment.GetEnvironmentVariable("NC_TASK002_TOKEN") ?? "";
@@ -63,14 +71,35 @@ public sealed class RuntimePlugin : BaseUnityPlugin
                     // Load metadata/dependencies on this I/O worker before main-thread DI.
                     var moduleDirectory = Path.GetDirectoryName(compositionPath);
                     // Use Unity's existing platform shims, never NuGet Span duplicates.
-                    foreach (var name in new[] { "System.Buffers.dll", "System.Runtime.CompilerServices.Unsafe.dll", "System.Memory.dll" })
+                    foreach (var name in new[]
+                    {
+                        "System.Buffers.dll",
+                        "System.Runtime.CompilerServices.Unsafe.dll",
+                        "System.Memory.dll"
+                    }
+
+                    )
+                    {
                         System.Reflection.Assembly.LoadFrom(Path.Combine(platformDirectory, name));
-                    foreach (var name in new[] { "Google.Protobuf.dll", "Gateway.Api.dll", "SeaPower.Client.dll" })
+                    }
+
+                    foreach (var name in new[]
+                    {
+                        "Google.Protobuf.dll",
+                        "Gateway.Api.dll",
+                        "SeaPower.Client.dll"
+                    }
+
+                    )
+                    {
                         System.Reflection.Assembly.LoadFrom(Path.Combine(moduleDirectory, name));
+                    }
+
                     plainState.CompositionAssembly = System.Reflection.Assembly.LoadFrom(compositionPath);
                     plainState.CompositionLoaded = true;
                     log.WriteLine(DateTime.UtcNow.ToString("o") + " task004-metadata-loaded worker=" + Thread.CurrentThread.ManagedThreadId);
                 }
+
                 while (!plainState.Stop || !plainQueue.IsEmpty)
                 {
                     if (Volatile.Read(ref plainState.Dropped) > 0)
@@ -78,14 +107,24 @@ public sealed class RuntimePlugin : BaseUnityPlugin
                         log.WriteLine("evidence-overflow dropped=" + Volatile.Read(ref plainState.Dropped));
                         File.WriteAllText(Path.Combine(directory, "evidence-error.json"), "{\"error\":\"queue-overflow\"}");
                     }
+
                     while (plainQueue.TryDequeue(out var line))
                     {
-                        if (line.Contains(" PRIVILEGED ")) privileged.WriteLine(line);
-                        else log.WriteLine(line);
+                        if (line.Contains(" PRIVILEGED "))
+                        {
+                            privileged.WriteLine(line);
+                        }
+                        else
+                        {
+                            log.WriteLine(line);
+                        }
+
                         if (line.Contains(" playable-ready ") && Guid.TryParse(token, out _))
-                            File.WriteAllText(Path.Combine(directory, "ready.json"),
-                                "{\"ready\":true,\"token\":\"" + token + "\",\"pid\":" + pid + "}");
+                        {
+                            File.WriteAllText(Path.Combine(directory, "ready.json"), "{\"ready\":true,\"token\":\"" + token + "\",\"pid\":" + pid + "}");
+                        }
                     }
+
                     log.Flush();
                     privileged.Flush();
                     Thread.Sleep(25);
@@ -94,11 +133,19 @@ public sealed class RuntimePlugin : BaseUnityPlugin
             catch (Exception e)
             {
                 plainState.Failed = true;
-                try { File.WriteAllText(Path.Combine(directory, "evidence-error.json"),
-                    "{\"error\":\"writer-failed\",\"type\":\"" + e.GetType().Name + "\"}"); }
-                catch { /* No marker can be created; external timeout still cannot pass. */ }
+                try
+                {
+                    File.WriteAllText(Path.Combine(directory, "evidence-error.json"), "{\"error\":\"writer-failed\",\"type\":\"" + e.GetType().Name + "\"}");
+                }
+                catch
+                { /* No marker can be created; external timeout still cannot pass. */
+                }
             }
-        }) { IsBackground = true, Name = "Task002 Evidence Writer" };
+        })
+        {
+            IsBackground = true,
+            Name = "Task002 Evidence Writer"
+        };
         writer.Start();
         Emit("plugin-awake thread=" + Thread.CurrentThread.ManagedThreadId);
         Emit("assembly=" + typeof(GameMain).Assembly.FullName);
@@ -106,56 +153,115 @@ public sealed class RuntimePlugin : BaseUnityPlugin
 
     private void Emit(string value)
     {
-        if (writerState.Queue.Count < 128) writerState.Queue.Enqueue(DateTime.UtcNow.ToString("o") + " " + value);
-        else Interlocked.Increment(ref writerState.Dropped);
+        if (writerState.Queue.Count < 128)
+        {
+            writerState.Queue.Enqueue(DateTime.UtcNow.ToString("o") + " " + value);
+        }
+        else
+        {
+            Interlocked.Increment(ref writerState.Dropped);
+        }
     }
 
     private void Update()
     {
-        if (!active) return;
+        if (!active)
+        {
+            return;
+        }
+
         if (writerState.Failed)
         {
-            if (diagnostics) DiagnosticProbe.Remove();
-            if (airOps) AirOpsProbe.Remove();
-            diagnostics = false; active = false; return;
+            if (diagnostics)
+            {
+                DiagnosticProbe.Remove();
+            }
+
+            if (airOps)
+            {
+                AirOpsProbe.Remove();
+            }
+
+            diagnostics = false;
+            active = false;
+            return;
         }
+
         if (!installed && Globals.mainThread == Thread.CurrentThread)
         {
-            if (System.Environment.GetEnvironmentVariable("NC_TASK004_ENABLED") == "1" && !writerState.CompositionLoaded) return;
+            if (System.Environment.GetEnvironmentVariable("NC_TASK004_ENABLED") == "1" && !writerState.CompositionLoaded)
+            {
+                return;
+            }
+
             installed = true;
             if (System.Environment.GetEnvironmentVariable("NC_TASK004_ENABLED") == "1")
             {
-                try {
+                try
+                {
                     var assembly = writerState.CompositionAssembly;
                     assembly.GetType("NavalCommand.SeaPower.Mod.Bootstrap").GetMethod("Attach").Invoke(null, null);
                     Emit("task004-composition-attached");
-                } catch (Exception e) { Emit("task004-bootstrap-failed " + e); }
+                }
+                catch (Exception e)
+                {
+                    Emit("task004-bootstrap-failed " + e);
+                }
             }
+
             Emit("unity-thread-confirmed id=" + Thread.CurrentThread.ManagedThreadId);
             diagnostics = System.Environment.GetEnvironmentVariable("NC_TASK002_PROBES") == "1";
             airOps = System.Environment.GetEnvironmentVariable("NC_TASK003_AIROPS") == "1";
-            if (airOps) AirOpsProbe.Install(Emit);
+            if (airOps)
+            {
+                AirOpsProbe.Install(Emit);
+            }
+
             lifecycleTest = System.Environment.GetEnvironmentVariable("NC_TASK002_LIFECYCLE") == "1";
-            if (diagnostics) DiagnosticProbe.Install(Emit);
+            if (diagnostics)
+            {
+                DiagnosticProbe.Install(Emit);
+            }
+
             if (!string.IsNullOrWhiteSpace(mission) && !string.IsNullOrWhiteSpace(side))
             {
-                try { candidate = LaunchCandidate.Install(mission, side); }
-                catch (Exception e) { Emit("install-failed " + e); }
+                try
+                {
+                    candidate = LaunchCandidate.Install(mission, side);
+                }
+                catch (Exception e)
+                {
+                    Emit("install-failed " + e);
+                }
             }
         }
+
         if (candidate != null)
-            while (candidate.TryReadPhase(out var phase)) Emit(phase);
-        if (diagnostics) DiagnosticProbe.UpdatePauseExperiment();
-        if (airOps) AirOpsProbe.Update();
-        if (System.Environment.GetEnvironmentVariable("NC_TASK004_RELOAD_TEST") == "1" && !reloadRequested && GameTime.missionElapsedTime > 15 &&
-            Singleton<GameMain>.InstanceExists() && Singleton<GameMain>.Instance._initialized)
+        {
+            while (candidate.TryReadPhase(out var phase))
+            {
+                Emit(phase);
+            }
+        }
+
+        if (diagnostics)
+        {
+            DiagnosticProbe.UpdatePauseExperiment();
+        }
+
+        if (airOps)
+        {
+            AirOpsProbe.Update();
+        }
+
+        if (System.Environment.GetEnvironmentVariable("NC_TASK004_RELOAD_TEST") == "1" && !reloadRequested && GameTime.missionElapsedTime > 15 && Singleton<GameMain>.InstanceExists() && Singleton<GameMain>.Instance._initialized)
         {
             reloadRequested = true;
             Emit("task004-native-unload-reload-requested");
             Singleton<MissionManager>.Instance.UnloadMissionAndReload();
         }
-        if (diagnostics && lifecycleTest && !reloadRequested && GameTime.missionElapsedTime > 15 &&
-            Singleton<GameMain>.InstanceExists() && Singleton<GameMain>.Instance._initialized)
+
+        if (diagnostics && lifecycleTest && !reloadRequested && GameTime.missionElapsedTime > 15 && Singleton<GameMain>.InstanceExists() && Singleton<GameMain>.Instance._initialized)
         {
             reloadRequested = true;
             DiagnosticProbe.PrepareOwnedUnload();
@@ -164,19 +270,39 @@ public sealed class RuntimePlugin : BaseUnityPlugin
         }
     }
 
-    private void SceneLoaded(Scene scene, LoadSceneMode mode) { Emit("scene-loaded buildIndex=" + scene.buildIndex + " thread=" + Thread.CurrentThread.ManagedThreadId); }
+    private void SceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Emit("scene-loaded buildIndex=" + scene.buildIndex + " thread=" + Thread.CurrentThread.ManagedThreadId);
+    }
+
     private void SceneUnloaded(Scene scene)
     {
         Emit("scene-unloaded buildIndex=" + scene.buildIndex + " thread=" + Thread.CurrentThread.ManagedThreadId);
-        if(scene.buildIndex == 2 && diagnostics) DiagnosticProbe.InvalidateScene();
-        if(scene.buildIndex == 2 && airOps) AirOpsProbe.Remove();
+        if (scene.buildIndex == 2 && diagnostics)
+        {
+            DiagnosticProbe.InvalidateScene();
+        }
+
+        if (scene.buildIndex == 2 && airOps)
+        {
+            AirOpsProbe.Remove();
+        }
     }
+
     private void OnDestroy()
     {
-        SceneManager.sceneLoaded -= SceneLoaded; SceneManager.sceneUnloaded -= SceneUnloaded;
-        if(diagnostics) DiagnosticProbe.Remove(); Emit("plugin-destroyed"); writerState.Stop = true;
-        if(airOps) AirOpsProbe.Remove();
+        SceneManager.sceneLoaded -= SceneLoaded;
+        SceneManager.sceneUnloaded -= SceneUnloaded;
+        if (diagnostics)
+        {
+            DiagnosticProbe.Remove();
+        }
+
+        Emit("plugin-destroyed");
+        writerState.Stop = true;
+        if (airOps)
+        {
+            AirOpsProbe.Remove();
+        }
     }
 }
-
-

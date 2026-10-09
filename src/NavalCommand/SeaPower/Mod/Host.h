@@ -9,12 +9,12 @@
 #else
 #define NC_EXPORT
 #endif
-extern "C" {
-NC_EXPORT uint32_t nc_abi_version();
-NC_EXPORT int nc_initialize(uint32_t abi, const char *endpoint);
-NC_EXPORT int nc_publish_view(const uint8_t *bytes, uint32_t length);
-NC_EXPORT int nc_publish_result(const uint8_t *bytes, uint32_t length);
-NC_EXPORT int nc_poll_order(uint8_t *destination, uint32_t capacity,
-                            uint32_t *length);
-NC_EXPORT int nc_shutdown();
+extern "C"
+{
+	NC_EXPORT uint32_t nc_abi_version();
+	NC_EXPORT int nc_initialize(uint32_t abi, const char *endpoint);
+	NC_EXPORT int nc_publish_view(const uint8_t *bytes, uint32_t length);
+	NC_EXPORT int nc_publish_result(const uint8_t *bytes, uint32_t length);
+	NC_EXPORT int nc_poll_order(uint8_t *destination, uint32_t capacity, uint32_t *length);
+	NC_EXPORT int nc_shutdown();
 }
