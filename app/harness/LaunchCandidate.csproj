@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GameManaged Condition="'$(GameManaged)' == ''">C:/Games/Sea_Power_8_3/Sea Power_Data/Managed</GameManaged>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="LaunchCandidate.cs" />
+    <Compile Include="RuntimePlugin.cs" />
+    <Compile Include="DiagnosticProbe.cs" />
+    <Compile Include="AirOpsProbe.cs" />
+    <Reference Include="0Harmony"><HintPath>$(GameManaged)/../../BepInEx/core/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UniRx"><HintPath>$(GameManaged)/UniRx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Plugins"><HintPath>$(GameManaged)/Plugins.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Libraries"><HintPath>$(GameManaged)/Libraries.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="ParadoxNotion"><HintPath>$(GameManaged)/ParadoxNotion.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Entities"><HintPath>$(GameManaged)/Unity.Entities.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><HintPath>$(GameManaged)/Unity.Mathematics.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BepInEx"><HintPath>$(GameManaged)/../../BepInEx/core/BepInEx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Seapower-Scripts"><HintPath>$(GameManaged)/Seapower-Scripts.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameManaged)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(GameManaged)/UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Noesis.NoesisGUI"><HintPath>$(GameManaged)/Noesis.NoesisGUI.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

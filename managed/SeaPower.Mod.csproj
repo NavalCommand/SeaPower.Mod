@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>netstandard2.1</TargetFramework><LangVersion>12</LangVersion><EnableDefaultCompileItems>false</EnableDefaultCompileItems><GameManaged Condition="'$(GameManaged)' == ''">C:/Games/Sea_Power_8_3/Sea Power_Data/Managed</GameManaged></PropertyGroup>
+<ItemGroup><Compile Include="*.cs" /><ProjectReference Include="$(SeaPowerClientSource)/SeaPower.Client.csproj" /></ItemGroup>
+<ItemGroup>
+<Reference Include="0Harmony"><HintPath>$(GameManaged)/../../BepInEx/core/0Harmony.dll</HintPath><Private>false</Private></Reference>
+<Reference Include="Seapower-Scripts"><HintPath>$(GameManaged)/Seapower-Scripts.dll</HintPath><Private>false</Private></Reference>
+<Reference Include="UnityEngine.CoreModule"><HintPath>$(GameManaged)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+<Reference Include="UnityEngine"><HintPath>$(GameManaged)/UnityEngine.dll</HintPath><Private>false</Private></Reference>
+<Reference Include="Plugins"><HintPath>$(GameManaged)/Plugins.dll</HintPath><Private>false</Private></Reference>
+<Reference Include="Libraries"><HintPath>$(GameManaged)/Libraries.dll</HintPath><Private>false</Private></Reference>
+</ItemGroup></Project>
+
