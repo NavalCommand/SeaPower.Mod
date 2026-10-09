@@ -1,5 +1,5 @@
-#include "Host.h"
 #include <NavalCommand/Gateway/Api/Codec.h>
+#include <NavalCommand/SeaPower/Mod/Host.h>
 #include <grpcpp/grpcpp.h>
 #include <gtest/gtest.h>
 #include <navalcommand/gateway/v1/service.grpc.pb.h>
@@ -26,28 +26,30 @@ TEST(Host, VersionBoundsPortAndSessionReset) {
 	request.set_request_id("r");
 	OrderResult result;
 	{
-		grpc::ClientContext c;
-		ASSERT_TRUE(stub->SubmitOrder(&c, request, &result).ok());
+		grpc::ClientContext context;
+		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
 		EXPECT_EQ(result.stage(), REQUEST_RECEIVED);
 	}
 	{
-		grpc::ClientContext c;
-		ASSERT_TRUE(stub->SubmitOrder(&c, request, &result).ok());
+		grpc::ClientContext context;
+		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
 	}
-	uint8_t small[1], buffer[65536];
+	constexpr std::size_t MAXIMUM_ORDER_BYTES = 65'536;
+	uint8_t undersizedBuffer[1];
+	uint8_t buffer[MAXIMUM_ORDER_BYTES];
 	uint32_t length = 0;
-	EXPECT_EQ(nc_poll_order(small, 1, &length), 2);
+	EXPECT_EQ(nc_poll_order(undersizedBuffer, 1, &length), 2);
 	EXPECT_GT(length, 1);
 	EXPECT_EQ(nc_poll_order(buffer, sizeof(buffer), &length), 0);
-	OrderRequest parsed;
-	ASSERT_TRUE(parsed.ParseFromArray(buffer, length));
-	EXPECT_EQ(parsed.request_id(), "r");
+	OrderRequest parsedRequest;
+	ASSERT_TRUE(parsedRequest.ParseFromArray(buffer, length));
+	EXPECT_EQ(parsedRequest.request_id(), "r");
 	EXPECT_EQ(nc_poll_order(buffer, sizeof(buffer), &length), 1);
-	for (int i = 0; i < 65; ++i) {
-		request.set_request_id("queue-" + std::to_string(i));
-		grpc::ClientContext c;
-		ASSERT_TRUE(stub->SubmitOrder(&c, request, &result).ok());
-		if (i == 64) {
+	for (int commandIndex = 0; commandIndex < 65; ++commandIndex) {
+		request.set_request_id("queue-" + std::to_string(commandIndex));
+		grpc::ClientContext context;
+		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
+		if (commandIndex == 64) {
 			EXPECT_EQ(result.reason(), "queue_full");
 		}
 	}
@@ -56,9 +58,9 @@ TEST(Host, VersionBoundsPortAndSessionReset) {
 	EXPECT_EQ(nc_publish_view(reinterpret_cast<const uint8_t *>(bytes.data()), bytes.size()), 0);
 	EXPECT_EQ(nc_poll_order(buffer, sizeof(buffer), &length), 1);
 	{
-		grpc::ClientContext c;
+		grpc::ClientContext context;
 		request.set_request_id("old");
-		ASSERT_TRUE(stub->SubmitOrder(&c, request, &result).ok());
+		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
 		EXPECT_EQ(result.reason(), "stale_session");
 	}
 	EXPECT_EQ(nc_publish_view(buffer, 1048577), 2);
