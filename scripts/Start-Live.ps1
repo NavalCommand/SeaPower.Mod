@@ -6,6 +6,8 @@ param(
     [string]$Package = (Join-Path (Split-Path $PSScriptRoot) 'o/package/0.1.0'),
     [string]$HarnessPackage = (Join-Path (Split-Path $PSScriptRoot) 'o/harness/0.1.0'),
     [string]$Cli,
+    [string[]]$ClientArguments = @(),
+    [string]$FixtureAssembly,
     [string]$Scenario = (Join-Path (Split-Path $PSScriptRoot) 'managed/harness/scenarios/MinimalCombat.ini'),
     [string]$Side = 'Taskforce1',
     [string]$RuntimeLogDirectory,
@@ -26,7 +28,16 @@ if (@(Get-Process -Name 'Sea Power' -ErrorAction SilentlyContinue).Count) {
 }
 $useRuntime = $Mode -ne 'Harness'
 $useHarness = $Mode -ne 'Production'
-if (($Smoke -or $Blocked -or $ReloadTest) -and (!$useRuntime -or $RuntimeDisabled -or !$Cli)) {
+if ($FixtureAssembly -and !$useHarness) {
+    throw 'A regression fixture requires the explicitly enabled harness'
+}
+if ($FixtureAssembly) {
+    $FixtureAssembly = (Resolve-Path -LiteralPath $FixtureAssembly).Path
+    if ([IO.Path]::GetExtension($FixtureAssembly) -ne '.dll') {
+        throw 'A fixture must be an explicitly selected managed plugin DLL'
+    }
+}
+if (($Smoke -or $Blocked -or $ReloadTest -or $ClientArguments.Count) -and (!$useRuntime -or $RuntimeDisabled -or !$Cli)) {
     throw 'Command/reload checks require the explicitly enabled runtime and external CLI'
 }
 if ($ReloadTest -and !$useHarness) {
@@ -69,9 +80,16 @@ else {
     New-Item -ItemType Directory -Path $OutputDirectory | Out-Null
 }
 $runDirectory = (Resolve-Path -LiteralPath $OutputDirectory).Path
+if ($useRuntime) {
+    Copy-Item -LiteralPath (Join-Path $runtimeStage 'manifest.json') -Destination (Join-Path $runDirectory 'runtime-manifest.json')
+}
+if ($useHarness) {
+    Copy-Item -LiteralPath (Join-Path $harnessStage 'manifest.json') -Destination (Join-Path $runDirectory 'harness-manifest.json')
+}
 $runtimePluginDirectory = Join-Path $GameRoot 'BepInEx/plugins/NavalCommand.Runtime'
 $harnessPluginDirectory = Join-Path $GameRoot 'BepInEx/plugins/NavalCommand.Harness'
-foreach ($directory in @($runtimePluginDirectory, $harnessPluginDirectory)) {
+$fixturePluginDirectory = Join-Path $GameRoot 'BepInEx/plugins/NavalCommand.Fixture'
+foreach ($directory in @($runtimePluginDirectory, $harnessPluginDirectory, $fixturePluginDirectory)) {
     if (Test-Path -LiteralPath $directory) {
         throw "An existing deployment must be left untouched: $directory"
     }
@@ -94,6 +112,14 @@ $gameProcess = $null
 $installedDirectories = @()
 $cleanupMode = 'not-started'
 try {
+    if ($FixtureAssembly) {
+        New-Item -ItemType Directory -Path $fixturePluginDirectory | Out-Null
+        $installedDirectories += $fixturePluginDirectory
+        Copy-Item -LiteralPath $FixtureAssembly -Destination $fixturePluginDirectory
+        $startInfo.Environment['NC_FIXTURE_ENABLED'] = '1'
+        @{ assembly = $FixtureAssembly; sha256 = (Get-FileHash -LiteralPath $FixtureAssembly).Hash } |
+            ConvertTo-Json | Set-Content "$runDirectory/fixture.json"
+    }
     if ($useRuntime) {
         New-Item -ItemType Directory -Path $runtimePluginDirectory | Out-Null
         $installedDirectories += $runtimePluginDirectory
@@ -177,6 +203,7 @@ try {
             }
         }
         $cliArguments = @('--endpoint', $config.endpoint)
+        $cliArguments += $ClientArguments
         if ($Smoke) { $cliArguments += '--smoke' }
         if ($Blocked) { $cliArguments += '--blocked' }
         if ($ReloadTest) { $cliArguments += '--reload' }
@@ -186,7 +213,7 @@ try {
             throw "CLI failed: $cliExitCode"
         }
     }
-    [ordered]@{ ready = $ready; mode = $Mode; cliExitCode = $cliExitCode; optedIntoMutation = [bool]($Smoke -or $Blocked); finishedUtc = [DateTime]::UtcNow.ToString('o') } |
+    [ordered]@{ ready = $ready; mode = $Mode; cliExitCode = $cliExitCode; clientArguments = $ClientArguments; optedIntoMutation = [bool]($Smoke -or $Blocked -or $ClientArguments.Count); finishedUtc = [DateTime]::UtcNow.ToString('o') } |
         ConvertTo-Json | Set-Content "$runDirectory/result.json"
     if ($NormalExit) {
         # WM_CLOSE asks Unity to close normally; forced fallback is recorded separately.
@@ -218,7 +245,7 @@ finally {
         $resolvedDirectory = [IO.Path]::GetFullPath($directory)
         $pluginRoot = [IO.Path]::GetFullPath((Join-Path $GameRoot 'BepInEx/plugins')).TrimEnd('\') + '\'
         if (!$resolvedDirectory.StartsWith($pluginRoot, [StringComparison]::OrdinalIgnoreCase) -or
-            (Split-Path $resolvedDirectory -Leaf) -notin @('NavalCommand.Runtime', 'NavalCommand.Harness')) {
+            (Split-Path $resolvedDirectory -Leaf) -notin @('NavalCommand.Runtime', 'NavalCommand.Harness', 'NavalCommand.Fixture')) {
             throw 'Refusing cleanup outside owned plugin directories'
         }
         Remove-Item -LiteralPath $resolvedDirectory -Recurse -Force
