@@ -3,7 +3,7 @@
 Project-wide documentation is maintained in the separate **Docs Git repository**. Before changing this module, explicitly read [Docs/AGENTS.md](../Docs/AGENTS.md), [architecture](../Docs/ARCHITECTURE.md), [module/build policy](../Docs/MODULE_STRUCTURE.md), [local sources](../Docs/LOCAL_SOURCES.md), and [code style](../Docs/CODE_STYLE.md) with its [owner export](../Docs/CodeStyle.xml). The shared instructions are not discovered automatically across repository boundaries; do not create a competing AGENTS.md in the parent workspace. Historical reports and reproduction guides are indexed under [Docs/Tasks/](../Docs/Tasks/README.md), with run receipts under [Docs/Evidence/](../Docs/Evidence/README.md).
 
 
-
+<!--TODO Some build scripts use out/ for build artifacts. Reuse o/ for the sake of consistency with CMake-->
 
 The composition root preserves C ABI revision 1, provider/gateway separation, loopback-only hosting, bounded byte mailboxes and protected native command dispatch. Native host production targets remain in `src/`; ABI and managed lifecycle/configuration tests live in `test/`.
 
