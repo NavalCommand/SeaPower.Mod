@@ -1,5 +1,6 @@
 #pragma once
 #include <NavalCommand/Gateway/Api/Codec.h>
+#include <NavalCommand/Orders/Api/Request.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -76,20 +77,20 @@ namespace NavalCommand::SeaPower::Mod
 				result = reject("wrong_side_or_invalid_entity");
 			}
 			else if (!request.facilityLaunch &&
-				(!request.waypoint || !std::isfinite(request.waypoint->latitudeDeg) || !std::isfinite(request.waypoint->longitudeDeg) ||
-					std::abs(request.waypoint->latitudeDeg) > MAXIMUM_LATITUDE_DEGREES || std::abs(request.waypoint->longitudeDeg) > MAXIMUM_LONGITUDE_DEGREES))
+				(!request.routeCommand || !std::isfinite(request.routeCommand->latitudeDeg) || !std::isfinite(request.routeCommand->longitudeDeg) ||
+					std::abs(request.routeCommand->latitudeDeg) > MAXIMUM_LATITUDE_DEGREES || std::abs(request.routeCommand->longitudeDeg) > MAXIMUM_LONGITUDE_DEGREES))
 			{
 				result = reject("invalid_arguments");
 			}
 			else if (request.facilityLaunch &&
-				(request.waypoint || request.facilityLaunch->count != 1 || request.facilityLaunch->classKey.empty() || request.facilityLaunch->squadron.empty() ||
+				(request.routeCommand || request.facilityLaunch->count != 1 || request.facilityLaunch->classKey.empty() || request.facilityLaunch->squadron.empty() ||
 					request.facilityLaunch->loadout.empty() || request.facilityLaunch->classKey.size() > MAXIMUM_ID_CHARACTERS ||
 					request.facilityLaunch->squadron.size() > MAXIMUM_ID_CHARACTERS || request.facilityLaunch->loadout.size() > MAXIMUM_ID_CHARACTERS))
 			{
 				result = reject("invalid_arguments");
 			}
-			else if (request.waypoint && request.waypoint->routeMode != Orders::Api::RouteMode::LegacyIdle && request.waypoint->routeMode != Orders::Api::RouteMode::ReplaceRoute &&
-				request.waypoint->routeMode != Orders::Api::RouteMode::AppendWaypoint)
+			else if (request.routeCommand && request.routeCommand->routeMode != Orders::Api::RouteMode::LegacyIdle && request.routeCommand->routeMode != Orders::Api::RouteMode::ReplaceRoute &&
+				request.routeCommand->routeMode != Orders::Api::RouteMode::AppendWaypoint)
 			{
 				result = reject("unsupported_route_mode");
 			}
@@ -193,4 +194,4 @@ namespace NavalCommand::SeaPower::Mod
 			return 0;
 		}
 	};
-} // namespace NavalCommand::SeaPower::Mod
+}
