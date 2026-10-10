@@ -3,7 +3,7 @@
 Project-wide documentation is maintained in the separate **Docs Git repository**. Before changing this module, explicitly read [Docs/AGENTS.md](../Docs/AGENTS.md), [architecture](../Docs/ARCHITECTURE.md), [module/build policy](../Docs/MODULE_STRUCTURE.md), [local sources](../Docs/LOCAL_SOURCES.md), and [code style](../Docs/CODE_STYLE.md) with its [owner export](../Docs/CodeStyle.xml). The shared instructions are not discovered automatically across repository boundaries; do not create a competing AGENTS.md in the parent workspace. Historical reports and reproduction guides are indexed under [Docs/Tasks/](../Docs/Tasks/README.md), with run receipts under [Docs/Evidence/](../Docs/Evidence/README.md).
 
 
-<!--TODO Some build scripts use out/ for build artifacts. Reuse o/ for the sake of consistency with CMake-->
+
 
 The composition root preserves C ABI revision 1, provider/gateway separation, loopback-only hosting, bounded byte mailboxes and protected native command dispatch. Native host production targets remain in `src/`; ABI and managed lifecycle/configuration tests live in `test/`.
 
@@ -23,9 +23,9 @@ For an approved deployment, place the runtime package files together under `BepI
 
 The harness is inactive unless `NC_HARNESS_ENABLED=1`. A controlled run also requires absolute `NC_HARNESS_SCENARIO` and `NC_HARNESS_RUN_DIRECTORY`, the mission's native `NC_HARNESS_SIDE`, and a GUID `NC_HARNESS_TOKEN`. `NC_HARNESS_RELOAD=1` requests the maintained reload regression action. The launcher validates mission side and the inspected game assembly hash before starting. Receipts retain `ready.json` with token/PID identity; diagnostics are now in `harness.log`. Evidence failures cannot count as readiness. Former probe/interference switches are removed, with historical sources archived in the authoritative Docs task archive.
 
-`scripts/Build.ps1 -GameRoot ACTUAL_INSTALL -CMake cmake [-BuildCMakeSource ACTUAL_CHECKOUT]` builds/tests the native composition and managed runtime, using CMake-generated `managed-paths.json`. Its fresh production stage is `out/package/0.1.0`: four permitted managed DLLs, native host, disabled configuration, licenses and manifest. It excludes the harness, scenarios, probes, game references and platform `System.*` DLLs. Unity's installed shims are loaded read-only.
+After CMake configuration, `cmake --build o/windows-msvc-release --target package-runtime` builds the native host, then the runtime's transitive MSBuild graph and stages `o/package/0.1.0`. The fresh production allowlist remains four permitted managed DLLs, native host, disabled configuration, licenses and manifest. No harness/scenarios/probes/game references/platform `System.*` DLLs are redistributed.
 
-`scripts/Build-Harness.ps1 -GameRoot ACTUAL_INSTALL` independently builds and stages the harness and reusable scenario fixtures in `out/harness/0.1.0`. No API, provider, native host or runtime build is required. Existing stages are moved to uniquely named backups before a fresh package is assembled.
+`cmake --build o/windows-msvc-release --target package-harness` builds and stages only the harness and reusable scenarios in `o/harness/0.1.0`. No runtime/provider/native host compilation is needed for this target. Existing stages move to recoverable backups. The Build/Build-Harness scripts are thin wrappers over these targets, using already configured source/tool contexts.
 
 `scripts/Start-Live.ps1 -GameRoot ACTUAL_INSTALL -OutputDirectory NEW_DIR -ApproveLoaderChanges` requires explicit authorization for temporary loader/plugin changes and always removes only its owned deployments/process. Choose `-Mode Harness` for scenario readiness without the mod, `-Mode Production` for the mod without any scenario launcher (select a mission through the game menu), or `-Mode Combined` for both independently enabled plugins. `-RuntimeDisabled` exercises the disabled posture. Existing game sessions and deployments are refused. Loader bytes are restored exactly on success or failure.
 
@@ -50,3 +50,9 @@ The bootstrap option is unnecessary once Build.CMake is available at its declare
 Presets contain configurePresets only, windows-msvc-debug/release and linux-clang-debug/release where applicable. Output is o/${presetName}. C++26 policy is centralized; MSVC uses /std:c++latest for available features. No full C++26 conformance claim. Build outputs, Build.Local.cmake and CMakeUserPresets.json are ignored. No proprietary game binaries are included.
 
 Windows target and host dependencies use `x64-windows-static`, matching `/MT` in Release and `/MTd` in Debug. Reconfigure with `--fresh` and relink when migrating earlier dynamic-CRT artifacts.
+
+## Managed build integration
+
+Follow the authoritative [managed build policy](../Docs/MANAGED_BUILD.md). One CMake configure resolves internal source dependencies and persists each managed repository's ignored `o/managed/Build.Context.props`. Then ordinary `.csproj` builds in Visual Studio/Rider or `dotnet build ... -c Debug/Release` use those sources through real ProjectReferences without extra properties or another configure. Change source/tool/game-reference locations by reconfiguring, not by editing generated projects. Conflicting contexts require explicit `-DNAVALCOMMAND_REPLACE_MANAGED_CONTEXT=ON`; existing CMake consumers must then be reconfigured.
+
+All repository-owned generated files stay under `o/`: native preset directories, per-project MSBuild `o/managed/<project>/{bin,obj}/` directories and mod `o/package`/`o/harness` stages. MSBuild preserves configuration/platform/framework dimensions. The shared helper discovers managed/CMakeLists.txt and invokes only the requested top-level project; MSBuild owns NuGet and transitive compilation. Game-reference absence blocks only requested game-dependent projects.

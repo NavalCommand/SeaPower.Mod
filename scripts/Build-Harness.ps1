@@ -1,20 +1,10 @@
-param([Parameter(Mandatory)][string]$GameRoot)
+param(
+    [string]$Preset = 'windows-msvc-release',
+    [string]$Configuration = 'Release',
+    [string]$CMake = 'cmake'
+)
 $ErrorActionPreference = 'Stop'
-dotnet build "$PSScriptRoot/../managed/harness/SeaPower.Harness.csproj" -c Release "-p:GameManaged=$GameRoot/Sea Power_Data/Managed" --nologo
+& $CMake --build "$PSScriptRoot/../o/$Preset" --config $Configuration --target package-harness
 if ($LASTEXITCODE) {
-    throw 'Harness build failed'
+    throw 'package-harness failed; configure the selected preset before building.'
 }
-$stage = [IO.Path]::GetFullPath("$PSScriptRoot/../out/harness/0.1.0")
-if (Test-Path -LiteralPath $stage) {
-    Move-Item -LiteralPath $stage -Destination ($stage + '.previous-' + [Guid]::NewGuid().ToString('N'))
-}
-New-Item -ItemType Directory -Path $stage | Out-Null
-Copy-Item "$PSScriptRoot/../managed/harness/bin/Release/netstandard2.1/SeaPower.Harness.dll" $stage
-Copy-Item -Recurse "$PSScriptRoot/../managed/harness/scenarios" $stage
-Get-ChildItem -LiteralPath $stage -File -Recurse | ForEach-Object {
-    [ordered]@{
-        file = [IO.Path]::GetRelativePath($stage, $_.FullName).Replace('\', '/')
-        sha256 = (Get-FileHash -LiteralPath $_.FullName).Hash
-    }
-} | ConvertTo-Json | Set-Content "$stage/manifest.json"
-Write-Output $stage

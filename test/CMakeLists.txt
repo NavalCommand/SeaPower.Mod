@@ -16,6 +16,6 @@ target_compile_definitions(missing-exports-fixture PRIVATE FIXTURE_ABI_VERSION=1
 NavalCommandConfigureTarget(missing-exports-fixture)
 add_test(
     NAME managed-runtime-harness
-    COMMAND "${DOTNET_EXECUTABLE}" run --project "${PROJECT_SOURCE_DIR}/test/managed/RuntimeTests.csproj" -c Release
+    COMMAND "${DOTNET_EXECUTABLE}" run --project "${PROJECT_SOURCE_DIR}/test/managed/RuntimeTests.csproj" -c "$<CONFIG>"
         -- "$<TARGET_FILE:abi-mismatch-fixture>" "$<TARGET_FILE:missing-exports-fixture>"
 )

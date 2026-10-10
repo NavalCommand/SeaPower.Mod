@@ -8,6 +8,10 @@ $ErrorActionPreference = 'Stop'
 $anchorChainRevision = '28d225be917533fcc25e19cf8f25ac44010f8abd'
 $expectedSourceHash = '5DC88976D56D7A47ADD211DFA9C0436148FAA71B712FF4532AD9BE13101BFD0C'
 $workDirectory = [IO.Path]::GetFullPath($WorkDirectory)
+$repositoryOutputRoot = [IO.Path]::GetFullPath("$PSScriptRoot/../o").TrimEnd('\')
+if (!$workDirectory.StartsWith($repositoryOutputRoot + '\', [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'Source-build work directory must be inside this repository o/ directory.'
+}
 if (Test-Path -LiteralPath $workDirectory) {
     throw 'Choose a fresh source-build directory.'
 }
@@ -59,9 +63,14 @@ $projectXml = @"
 </Project>
 "@
 $projectPath = Join-Path $workDirectory 'AnchorChain.csproj'
+# The generated project inherits this repository's early output policy.
 Set-Content -LiteralPath $projectPath $projectXml
 dotnet build $projectPath -c Release --nologo
 if ($LASTEXITCODE -ne 0) {
     throw 'Anchor Chain source build failed.'
 }
-Write-Output (Join-Path $workDirectory 'bin/Release/netstandard2.1/AnchorChain.dll')
+$targetPath = dotnet msbuild $projectPath -getProperty:TargetPath -p:Configuration=Release
+if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $targetPath -PathType Leaf)) {
+    throw 'Evaluated Anchor Chain output is unavailable.'
+}
+Write-Output $targetPath
