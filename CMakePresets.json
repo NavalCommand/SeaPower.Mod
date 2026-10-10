@@ -2,13 +2,12 @@
   "version": 6,
   "configurePresets": [
     {
-      "name": "windows-msvc-debug",
+      "name": "windows-msvc-base",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/o/${presetName}",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_COMPILER": "cl.exe",
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_TARGET_TRIPLET": "x64-windows-static",
         "VCPKG_HOST_TRIPLET": "x64-windows-static",
         "BUILD_SHARED_LIBS": "OFF",
@@ -23,30 +22,21 @@
       "architecture": {
         "value": "x64",
         "strategy": "external"
+      },
+      "hidden": true
+    },
+    {
+      "name": "windows-msvc-debug",
+      "inherits": "windows-msvc-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
       "name": "windows-msvc-release",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/o/${presetName}",
+      "inherits": "windows-msvc-base",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CXX_COMPILER": "cl.exe",
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
-        "VCPKG_HOST_TRIPLET": "x64-windows-static",
-        "BUILD_SHARED_LIBS": "OFF",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      },
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     }
   ]
