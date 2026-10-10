@@ -3,14 +3,20 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>12</LangVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="*.cs" />
-    <ProjectReference Include="$(SeaPowerClientSource)/SeaPower.Client.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>$(GameManaged)/../../BepInEx/core/0Harmony.dll</HintPath>
+    <Reference Include="Plugins">
+      <HintPath>$(GameManaged)/Plugins.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Libraries">
+      <HintPath>$(GameManaged)/Libraries.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(GameManaged)/../../BepInEx/core/BepInEx.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Seapower-Scripts">
@@ -23,14 +29,6 @@
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(GameManaged)/UnityEngine.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Plugins">
-      <HintPath>$(GameManaged)/Plugins.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Libraries">
-      <HintPath>$(GameManaged)/Libraries.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>

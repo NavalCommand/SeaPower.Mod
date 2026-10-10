@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace NavalCommand.SeaPower.Mod;
 // I/O worker only. This type contains no Unity references.
 // DLL is deliberately not FreeLibrary'd; RPC code may have process-lifetime state.
-public sealed class NativeTransport
+public sealed class NativeTransport : INativeTransport
 {
     private const uint AbiVersion = 1;
     // Restrict dependency probing to the DLL directory and standard safe directories.
@@ -30,8 +30,14 @@ public sealed class NativeTransport
     readonly Publish publishResult;
     readonly Poll pollOrder;
     readonly Shutdown shutdownHost;
+    private bool started;
+    private bool stopped;
     public NativeTransport(string absolutePath)
     {
+        if (string.IsNullOrWhiteSpace(absolutePath) || !System.IO.Path.IsPathRooted(absolutePath))
+        {
+            throw new ArgumentException("Native library path must be absolute.");
+        }
         nativeLibrary = LoadLibraryEx(absolutePath, IntPtr.Zero, LoadLibrarySearchDllLoadDirectory | LoadLibrarySearchDefaultDirectories);
         if (nativeLibrary == IntPtr.Zero)
         {
@@ -62,9 +68,30 @@ public sealed class NativeTransport
         shutdownHost = Bind<Shutdown>("nc_shutdown");
     }
 
-    public int Start(string endpoint) => initializeHost(AbiVersion, endpoint);
+    public int Start(string endpoint)
+    {
+        if (stopped)
+        {
+            throw new InvalidOperationException("Transport has stopped.");
+        }
+        if (started)
+        {
+            return 0;
+        }
+        int status = initializeHost(AbiVersion, endpoint);
+        started = status == 0;
+        return status;
+    }
     public int PublishView(byte[] bytes) => publishView(bytes, (uint)bytes.Length);
     public int PublishResult(byte[] bytes) => publishResult(bytes, (uint)bytes.Length);
     public int PollOrder(byte[] buffer, out uint size) => pollOrder(buffer, (uint)buffer.Length, out size);
-    public int Stop() => shutdownHost();
+    public int Stop()
+    {
+        if (stopped || !started)
+        {
+            return 0;
+        }
+        stopped = true;
+        return shutdownHost();
+    }
 }

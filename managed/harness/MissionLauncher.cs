@@ -5,10 +5,10 @@ using SeaPower;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace NavalCommand.Task002;
+namespace NavalCommand.SeaPower.Harness;
 // Opt-in development bootstrap. The approved loader calls Install on Unity's main thread.
 // Readiness is deliberately narrow: a native player side, own units, and advancing time.
-public sealed class LaunchCandidate : MonoBehaviour
+public sealed class MissionLauncher : MonoBehaviour
 {
     private const float LaunchTimeoutWallSeconds = 180;
     private const int MaximumEvidencePhases = 32;
@@ -27,7 +27,7 @@ public sealed class LaunchCandidate : MonoBehaviour
     private int queued;
     // The caller prevalidates file existence, installed hash, native PlayerTaskforce,
     // fresh process, explicit opt-in and run token on an I/O worker BEFORE Install.
-    public static LaunchCandidate Install(string missionPath, string nativePlayerSide)
+    public static MissionLauncher Install(string missionPath, string nativePlayerSide)
     {
         if (Globals.mainThread != Thread.CurrentThread)
         {
@@ -44,15 +44,15 @@ public sealed class LaunchCandidate : MonoBehaviour
             throw new InvalidOperationException("Refusing an existing mission");
         }
 
-        var host = new GameObject("NavalCommand.Task002.LaunchCandidate");
+        var host = new GameObject("NavalCommand.SeaPower.Harness.MissionLauncher");
         DontDestroyOnLoad(host);
-        var probe = host.AddComponent<LaunchCandidate>();
-        probe.mission = missionPath;
-        probe.side = nativePlayerSide;
-        probe.ownerThread = Thread.CurrentThread.ManagedThreadId;
-        probe.deadline = Time.realtimeSinceStartup + LaunchTimeoutWallSeconds;
-        probe.Emit("adapter-installed-candidate");
-        return probe;
+        var launcher = host.AddComponent<MissionLauncher>();
+        launcher.mission = missionPath;
+        launcher.side = nativePlayerSide;
+        launcher.ownerThread = Thread.CurrentThread.ManagedThreadId;
+        launcher.deadline = Time.realtimeSinceStartup + LaunchTimeoutWallSeconds;
+        launcher.Emit("scenario-launcher-installed");
+        return launcher;
     }
 
     // Worker may drain only these immutable strings; never hand it native references.
@@ -104,8 +104,7 @@ public sealed class LaunchCandidate : MonoBehaviour
         {
             if (!requested)
             {
-                // Candidate predicate: menu scene plus the native load dependencies.
-                // Must be validated against callbacks before this becomes a supported hook.
+                // Wait for the inspected menu dependencies; this is an unofficial development hook.
                 if (!SceneManager.GetSceneByBuildIndex(MenuSceneBuildIndex).isLoaded || !Singleton<BackgroundSceneController>.InstanceExists()
                     || !Singleton<LoadScreen>.InstanceExists() || !Singleton<SeapowerUI.ViewModels.MenuSystemViewModel>.InstanceExists())
                 {
@@ -148,7 +147,7 @@ public sealed class LaunchCandidate : MonoBehaviour
                 return;
             }
 
-            // Narrow main-thread lifecycle slice: collection count, no unit/ECS fields.
+            // Readiness is checked on the verified engine thread after native initialization.
             if (Globals._playerTaskforce == null || Globals._playerTaskforce._taskforceUnits.Count == 0)
             {
                 return;
@@ -183,7 +182,7 @@ public sealed class LaunchCandidate : MonoBehaviour
 
             Emit("playable-ready side=" + side + " ownUnits=" + Globals._playerTaskforce._taskforceUnits.Count
                 + " controllableOwnUnit=true missionTime=" + GameTime.missionElapsedTime);
-            // No unit/ECS field reads, briefing dismissal, forced time step or pause release.
+            // Readiness never dismisses briefing, advances time or changes pause ownership.
             finished = true;
         }
         catch (Exception exception)
@@ -196,6 +195,6 @@ public sealed class LaunchCandidate : MonoBehaviour
     private void OnDestroy()
     {
         finished = true;
-        Emit("probe-destroyed");
+        Emit("scenario-launcher-destroyed");
     }
 }
