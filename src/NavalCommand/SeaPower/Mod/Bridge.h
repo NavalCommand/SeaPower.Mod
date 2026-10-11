@@ -78,9 +78,10 @@ public:
 		const auto overlay = std::ranges::find_if(m_Observation.OrderAvailability, [&](const auto &entry) {
 			return entry.Observer == request.Observer && entry.Observation == request.Observation;
 		});
-		if (!std::ranges::any_of(snapshot.Units, [&](const auto &unit) { return unit.Identity == request.Observation; }) ||
-			overlay == m_Observation.OrderAvailability.end()) {
+		if (!std::ranges::any_of(snapshot.Units, [&](const auto &unit) { return unit.Identity == request.Observation; })) {
 			result = reject("wrong_side_or_invalid_entity");
+		} else if (overlay == m_Observation.OrderAvailability.end()) {
+			result = reject("order_availability_unknown");
 		} else if (route && (!std::isfinite(route->Latitude.Value) || !std::isfinite(route->Longitude.Value) ||
 			std::abs(route->Latitude.Value) > MAXIMUM_LATITUDE_DEGREES || std::abs(route->Longitude.Value) > MAXIMUM_LONGITUDE_DEGREES)) {
 			result = reject("invalid_arguments");
@@ -93,12 +94,10 @@ public:
 		} else if (request.BasedOnVersion == 0 || request.BasedOnVersion > snapshot.Version ||
 			snapshot.Version - request.BasedOnVersion > MAXIMUM_OBSERVATION_AGE_VERSIONS) {
 			result = reject("stale_observation");
-		} else if (overlay->Orders.GetCoverage() == Uncertainty::Api::ObservedCollection<Eligibility>::Coverage::Unknown) {
-			result = reject("order_availability_unknown");
 		} else {
 			const auto kind = launch ? OrderKind::LaunchAircraft : route->Mode == RouteMode::ReplaceRoute ? OrderKind::ReplaceRoute :
 				route->Mode == RouteMode::AppendWaypoint ? OrderKind::AppendRoute : OrderKind::IdleWaypoint;
-			auto eligibility = std::ranges::find_if(overlay->Orders.Items(), [&](const auto &entry) {
+			auto eligibility = std::ranges::find_if(overlay->Orders, [&](const auto &entry) {
 				if (entry.Kind != kind) {
 					return false;
 				}
@@ -106,17 +105,18 @@ public:
 					entry.LaunchOption->Aircraft.Squadron == launch->Aircraft.Squadron &&
 					entry.LaunchOption->Aircraft.Loadout == launch->Aircraft.Loadout);
 			});
-			if (launch && eligibility == overlay->Orders.Items().end()) {
+			if (launch && eligibility == overlay->Orders.end()) {
 				// Invalid selectors still reach the authoritative game-thread validator.
-				eligibility = std::ranges::find_if(overlay->Orders.Items(), [&](const auto &entry) {
+				eligibility = std::ranges::find_if(overlay->Orders, [&](const auto &entry) {
 					return entry.Kind == kind && entry.Availability == Availability::Executable;
 				});
 			}
 			// This is a mailbox gate only. The game-thread adapter must independently
 			// revalidate the current observer, faction control, source mapping and native safety.
-			if (eligibility == overlay->Orders.Items().end()) {
-				result = reject(overlay->Orders.GetCoverage() == Uncertainty::Api::ObservedCollection<Eligibility>::Coverage::Complete ?
-					"unsupported_order" : "order_availability_unknown");
+			if (eligibility == overlay->Orders.end()) {
+				result = reject("order_availability_unknown");
+			} else if (eligibility->Availability == Availability::Unsupported) {
+				result = reject(eligibility->Reason.empty() ? "unsupported_order" : eligibility->Reason.c_str());
 			} else if (eligibility->Availability != Availability::Executable) {
 				result = reject(eligibility->Reason.empty() ? "order_availability_unknown" : eligibility->Reason.c_str());
 			} else if (m_Commands.size() >= MAXIMUM_QUEUED_COMMANDS) {

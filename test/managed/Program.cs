@@ -127,12 +127,19 @@ static class Program
             var own = new UnitObservation
             {
                 Identity = new ObservationId { Value = "own-observation" },
-                Navigation = new NavigationObservation { PlannedRoute = new RouteKnowledge { Known = new Route() } },
-                Aircraft = new AircraftObservation { Airborne = new BoolKnowledge { Known = false } },
+                Kinematics = new KinematicsObservation
+                {
+                    PartialPosition = new ObservedPosition
+                    {
+                        LatitudeDeg = 0,
+                        ErrorEllipse = new ObservedErrorEllipse { MajorAxisM = 100, MinorAxisM = 50 }
+                    }
+                },
+                Navigation = new NavigationObservation { PlannedRoute = new Route() },
+                Aircraft = new AircraftObservation { Airborne = false },
                 AirOperations = new AirOperationsObservation
                 {
-                    Inventory = new AircraftInventory { Coverage = CollectionCoverage.CoverageComplete },
-                    OnboardCount = new UInt32Knowledge { Known = 0 }
+                    OnboardCount = 0
                 }
             };
             observation.Snapshot.Units.Add(own);
@@ -142,7 +149,7 @@ static class Program
                 Observer = observer.Clone(),
                 Observation = own.Identity.Clone(),
                 BasedOnVersion = 1,
-                Eligibility = new OrderEligibilityState { Coverage = CollectionCoverage.CoverageComplete }
+                Eligibility = new OrderEligibilityState()
             });
             byte[] observationBytes = observation.ToByteArray();
             mailbox.Views.Enqueue(observationBytes);
@@ -160,13 +167,15 @@ static class Program
                 parsedCommand.PayloadCase == OrderRequest.PayloadOneofCase.Waypoint,
                 "Observer-scoped observation identity reaches exactly one typed command payload");
             var published = ProviderObservation.Parser.ParseFrom(transport.LastView);
-            Check(published.Snapshot.Units[0].Aircraft.Airborne.StateCase == BoolKnowledge.StateOneofCase.Known
-                && !published.Snapshot.Units[0].Aircraft.Airborne.Known, "Known false survives production transport mailbox");
-            Check(published.Snapshot.Units[0].AirOperations.OnboardCount.StateCase == UInt32Knowledge.StateOneofCase.Known
-                && published.Snapshot.Units[0].AirOperations.OnboardCount.Known == 0, "Observed known zero inventory survives mailbox");
-            Check(published.Snapshot.Units[0].Navigation.PlannedRoute.StateCase == RouteKnowledge.StateOneofCase.Known
-                && published.Snapshot.Units[0].Navigation.PlannedRoute.Known.Points.Count == 0
-                && published.OrderAvailability.Count == 1, "Known-empty route and separate observer-scoped discovery overlay survive mailbox");
+            Check(published.Snapshot.Units[0].Aircraft.HasAirborne
+                && !published.Snapshot.Units[0].Aircraft.Airborne, "Known false survives production transport mailbox");
+            Check(published.Snapshot.Units[0].AirOperations.HasOnboardCount
+                && published.Snapshot.Units[0].AirOperations.OnboardCount == 0, "Observed known zero inventory survives mailbox");
+            Check(published.Snapshot.Units[0].Navigation != null
+                && published.Snapshot.Units[0].Navigation.PlannedRoute != null
+                && published.Snapshot.Units[0].Kinematics.PartialPosition.HasLatitudeDeg
+                && !published.Snapshot.Units[0].Kinematics.PartialPosition.HasLongitudeDeg
+                && published.OrderAvailability.Count == 1, "Partial location, known-empty route and separate observer-scoped order overlay survive mailbox");
             mailbox.Stop = true;
             Wait(() => mailbox.Completed);
             Check(worker.Join(1000) && transport.Stops == 1, "Orderly off-thread shutdown happens once");

@@ -14,14 +14,23 @@ ProviderObservation Observation(const std::string &sessionId) {
 	snapshot->set_session_id(sessionId);
 	snapshot->set_ready(true);
 	snapshot->set_version(1);
-	snapshot->add_units()->mutable_identity()->set_value("own-observation");
-	snapshot->add_units()->mutable_identity()->set_value("ambiguous-observation");
+	auto own = snapshot->add_units();
+	own->mutable_identity()->set_value("own-observation");
+	own->mutable_kinematics()->mutable_partial_position()->set_latitude_deg(0);
+	own->mutable_kinematics()->mutable_partial_position()->set_longitude_deg(0);
+	own->mutable_navigation()->mutable_planned_route();
+	own->mutable_aircraft()->set_airborne(false);
+	own->mutable_air_operations()->set_onboard_count(0);
+	auto partial = snapshot->add_units();
+	partial->mutable_identity()->set_value("ambiguous-observation");
+	partial->mutable_kinematics()->mutable_partial_position()->set_latitude_deg(62);
+	partial->mutable_kinematics()->mutable_partial_position()->mutable_error_ellipse()->set_major_axis_m(500);
+	partial->mutable_kinematics()->mutable_partial_position()->mutable_error_ellipse()->set_minor_axis_m(250);
 	auto availability = observation.add_order_availability();
 	availability->set_session_id(sessionId);
 	*availability->mutable_observer() = snapshot->observer();
 	availability->mutable_observation()->set_value("own-observation");
 	availability->set_based_on_version(1);
-	availability->mutable_eligibility()->set_coverage(COVERAGE_COMPLETE);
 	auto eligibility = availability->mutable_eligibility()->add_items();
 	eligibility->set_kind(ORDER_KIND_IDLE_WAYPOINT);
 	eligibility->set_availability(EXECUTABLE);
@@ -69,6 +78,17 @@ TEST(Host, VersionBoundsObserverSnapshotAndSessionReset) {
 	ASSERT_EQ(publicSnapshot.units_size(), 2);
 	EXPECT_EQ(publicSnapshot.schema_version(), 4);
 	EXPECT_EQ(publicSnapshot.units(0).identity().value(), "own-observation");
+	EXPECT_TRUE(publicSnapshot.units(0).aircraft().has_airborne());
+	EXPECT_FALSE(publicSnapshot.units(0).aircraft().airborne());
+	EXPECT_TRUE(publicSnapshot.units(0).air_operations().has_onboard_count());
+	EXPECT_EQ(publicSnapshot.units(0).air_operations().onboard_count(), 0);
+	EXPECT_TRUE(publicSnapshot.units(0).navigation().has_planned_route());
+	EXPECT_EQ(publicSnapshot.units(0).navigation().planned_route().points_size(), 0);
+	EXPECT_TRUE(publicSnapshot.units(1).kinematics().has_partial_position());
+	EXPECT_TRUE(publicSnapshot.units(1).kinematics().partial_position().has_latitude_deg());
+	EXPECT_FALSE(publicSnapshot.units(1).kinematics().partial_position().has_longitude_deg());
+	EXPECT_TRUE(publicSnapshot.units(1).kinematics().partial_position().has_error_ellipse());
+	EXPECT_EQ(publicSnapshot.units(1).kinematics().partial_position().error_ellipse().major_axis_m(), 500);
 	EXPECT_EQ(publicSnapshot.GetDescriptor()->FindFieldByName("units")->message_type()->FindFieldByName("unit_id"), nullptr);
 
 	auto request = Request("host-one", "r");
@@ -89,7 +109,7 @@ TEST(Host, VersionBoundsObserverSnapshotAndSessionReset) {
 	{
 		grpc::ClientContext context;
 		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
-		EXPECT_EQ(result.reason(), "wrong_side_or_invalid_entity");
+		EXPECT_EQ(result.reason(), "order_availability_unknown");
 	}
 	request.mutable_observation()->set_value("own-observation");
 	constexpr std::size_t MAXIMUM_ORDER_BYTES = 65'536;
@@ -129,7 +149,7 @@ TEST(Host, VersionBoundsObserverSnapshotAndSessionReset) {
 	{
 		grpc::ClientContext context;
 		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
-		EXPECT_EQ(result.reason(), "wrong_side_or_invalid_entity");
+		EXPECT_EQ(result.reason(), "order_availability_unknown");
 	}
 	EXPECT_EQ(nc_publish_view(buffer, 1'048'577), 2);
 	EXPECT_EQ(nc_shutdown(), 0);
@@ -143,10 +163,17 @@ TEST(Host, UnknownBlockedAndInvalidPayloadDoNotEnterQueue) {
 	auto stub = Gateway::NewStub(grpc::CreateChannel("127.0.0.1:50058", grpc::InsecureChannelCredentials()));
 	auto observation = Observation("availability");
 	observation.mutable_order_availability(0)->mutable_eligibility()->clear_items();
-	observation.mutable_order_availability(0)->mutable_eligibility()->set_coverage(COVERAGE_UNKNOWN);
 	ASSERT_EQ(Publish(observation), 0);
 	auto request = Request("availability", "unknown");
 	OrderResult result;
+	{
+		grpc::ClientContext context;
+		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
+		EXPECT_EQ(result.reason(), "order_availability_unknown");
+	}
+	observation.mutable_order_availability(0)->mutable_eligibility()->add_items()->set_kind(ORDER_KIND_IDLE_WAYPOINT);
+	ASSERT_EQ(Publish(observation), 0);
+	request.set_request_id("unknown-row");
 	{
 		grpc::ClientContext context;
 		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
@@ -162,6 +189,28 @@ TEST(Host, UnknownBlockedAndInvalidPayloadDoNotEnterQueue) {
 		grpc::ClientContext context;
 		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
 		EXPECT_EQ(result.reason(), "protected_native_action");
+	}
+	observation = Observation("availability");
+	auto launchEligibility = observation.mutable_order_availability(0)->mutable_eligibility()->add_items();
+	launchEligibility->set_kind(ORDER_KIND_LAUNCH_AIRCRAFT);
+	launchEligibility->set_availability(BLOCKED);
+	launchEligibility->set_reason("native_launch_safety");
+	auto launchOption = launchEligibility->mutable_launch_option();
+	launchOption->set_count(1);
+	launchOption->mutable_selection()->mutable_type()->set_value("aircraft-type");
+	launchOption->mutable_selection()->set_squadron("squadron");
+	launchOption->mutable_selection()->mutable_loadout()->set_value("loadout");
+	ASSERT_EQ(Publish(observation), 0);
+	request = Request("availability", "unsafe-launch");
+	auto launch = request.mutable_launch_aircraft();
+	launch->set_count(1);
+	launch->mutable_selection()->mutable_type()->set_value("aircraft-type");
+	launch->mutable_selection()->set_squadron("squadron");
+	launch->mutable_selection()->mutable_loadout()->set_value("loadout");
+	{
+		grpc::ClientContext context;
+		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
+		EXPECT_EQ(result.reason(), "native_launch_safety");
 	}
 	request.clear_payload();
 	{
