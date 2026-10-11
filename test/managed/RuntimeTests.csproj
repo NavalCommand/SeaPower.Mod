@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <RequiresManagedContext>true</RequiresManagedContext>
     <TargetFramework>net10.0</TargetFramework>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
@@ -12,5 +13,6 @@
     <Compile Include="../../managed/runtime/INativeTransport.cs" />
     <Compile Include="../../managed/runtime/NativeTransport.cs" />
     <Compile Include="../../managed/harness/EvidenceWriter.cs" />
+    <ProjectReference Include="$(GatewayApiSource)/managed/Gateway.Api.csproj" />
   </ItemGroup>
 </Project>

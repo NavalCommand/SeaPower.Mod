@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Threading;
+using Google.Protobuf;
+using NavalCommand.Gateway.Wire;
 using NavalCommand.SeaPower.Mod;
 using NavalCommand.SeaPower.Harness;
 
@@ -110,13 +112,55 @@ static class Program
             Directory.CreateDirectory(config.LogDirectory);
             var mailbox = new RuntimeMailbox();
             var transport = new FakeTransport();
-            mailbox.Views.Enqueue(new byte[] { 1 });
-            mailbox.Results.Enqueue(new byte[] { 2 });
+            var observation = new ProviderObservation
+            {
+                Snapshot = new WorldSnapshot
+                {
+                    Session = new Session { SchemaVersion = 3, SessionId = "runtime-session", Ready = true },
+                    ObservationVersion = 1
+                }
+            };
+            var own = new UnitInstance
+            {
+                UnitId = new UnitId { Value = "own" },
+                Navigation = new NavigationState { PlannedRoute = new RouteKnowledge { Known = new Route() } },
+                Aircraft = new AircraftState { Airborne = new BoolKnowledge { Known = false } },
+                AirOperations = new AirOperations
+                {
+                    Inventory = new AircraftInventory { Coverage = CollectionCoverage.CoverageComplete },
+                    OnboardCount = new UInt32Knowledge { Known = 0 }
+                }
+            };
+            observation.Snapshot.Instances.Add(own);
+            observation.OrderAvailability.Add(new OrderDiscovery
+            {
+                SessionId = "runtime-session",
+                UnitId = own.UnitId.Clone(),
+                BasedOnVersion = 1,
+                Eligibility = new OrderEligibilityState { Coverage = CollectionCoverage.CoverageComplete }
+            });
+            byte[] observationBytes = observation.ToByteArray();
+            mailbox.Views.Enqueue(observationBytes);
+            mailbox.Results.Enqueue(new OrderResult
+            {
+                SessionId = "runtime-session", RequestId = "runtime-command", Stage = Stage.RequestReceived
+            }.ToByteArray());
             var worker = new Thread(() => TransportWorker.Run(mailbox, config, _ => transport));
             worker.Start();
             Wait(() => Volatile.Read(ref transport.Views) >= 2 && Volatile.Read(ref transport.Results) >= 2 && mailbox.Commands.Count == 1);
             Check(!mailbox.Failed, "Retryable publish backpressure preserves pending bytes");
-            Check(mailbox.Commands.TryDequeue(out byte[] command) && command[0] == 3, "Worker copies native command bytes");
+            Check(mailbox.Commands.TryDequeue(out byte[] command), "Worker copies native command bytes");
+            var parsedCommand = OrderRequest.Parser.ParseFrom(command);
+            Check(parsedCommand.UnitId.Value == own.UnitId.Value && parsedCommand.PayloadCase == OrderRequest.PayloadOneofCase.Waypoint,
+                "Same observation identity reaches exactly one typed command payload");
+            var published = ProviderObservation.Parser.ParseFrom(transport.LastView);
+            Check(published.Snapshot.Instances[0].Aircraft.Airborne.StateCase == BoolKnowledge.StateOneofCase.Known
+                && !published.Snapshot.Instances[0].Aircraft.Airborne.Known, "Known false survives production transport mailbox");
+            Check(published.Snapshot.Instances[0].AirOperations.OnboardCount.StateCase == UInt32Knowledge.StateOneofCase.Known
+                && published.Snapshot.Instances[0].AirOperations.OnboardCount.Known == 0, "Attached known zero inventory survives mailbox");
+            Check(published.Snapshot.Instances[0].Navigation.PlannedRoute.StateCase == RouteKnowledge.StateOneofCase.Known
+                && published.Snapshot.Instances[0].Navigation.PlannedRoute.Known.Points.Count == 0
+                && published.OrderAvailability.Count == 1, "Known-empty route and separate discovery overlay survive mailbox");
             mailbox.Stop = true;
             Wait(() => mailbox.Completed);
             Check(worker.Join(1000) && transport.Stops == 1, "Orderly off-thread shutdown happens once");
@@ -158,9 +202,14 @@ static class Program
         public int Views;
         public int Results;
         public int Stops;
+        public byte[] LastView;
         private bool sent;
         public int Start(string endpoint) => endpoint == "127.0.0.1:50051" ? 0 : -1;
-        public int PublishView(byte[] bytes) => Interlocked.Increment(ref Views) == 1 ? 1 : 0;
+        public int PublishView(byte[] bytes)
+        {
+            LastView = (byte[])bytes.Clone();
+            return Interlocked.Increment(ref Views) == 1 ? 1 : 0;
+        }
         public int PublishResult(byte[] bytes) => Interlocked.Increment(ref Results) == 1 ? 1 : 0;
         public int PollOrder(byte[] buffer, out uint size)
         {
@@ -169,8 +218,13 @@ static class Program
             {
                 return 1;
             }
-            buffer[0] = 3;
-            size = 1;
+            byte[] command = new OrderRequest
+            {
+                SessionId = "runtime-session", RequestId = "runtime-command", UnitId = new UnitId { Value = "own" },
+                BasedOnVersion = 1, Waypoint = new Waypoint { LatitudeDeg = 62, LongitudeDeg = -10 }
+            }.ToByteArray();
+            Buffer.BlockCopy(command, 0, buffer, 0, command.Length);
+            size = (uint)command.Length;
             sent = true;
             return 0;
         }
