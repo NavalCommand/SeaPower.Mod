@@ -9,15 +9,17 @@ namespace {
 ProviderObservation Observation(const std::string &sessionId) {
 	ProviderObservation observation;
 	auto snapshot = observation.mutable_snapshot();
-	snapshot->mutable_session()->set_schema_version(3);
-	snapshot->mutable_session()->set_session_id(sessionId);
-	snapshot->mutable_session()->set_ready(true);
-	snapshot->set_observation_version(1);
-	snapshot->add_instances()->mutable_unit_id()->set_value("own");
-	snapshot->add_instances()->mutable_unit_id()->set_value("contact");
+	snapshot->set_schema_version(4);
+	snapshot->mutable_observer()->set_value("mock-observer");
+	snapshot->set_session_id(sessionId);
+	snapshot->set_ready(true);
+	snapshot->set_version(1);
+	snapshot->add_units()->mutable_identity()->set_value("own-observation");
+	snapshot->add_units()->mutable_identity()->set_value("ambiguous-observation");
 	auto availability = observation.add_order_availability();
 	availability->set_session_id(sessionId);
-	availability->mutable_unit_id()->set_value("own");
+	*availability->mutable_observer() = snapshot->observer();
+	availability->mutable_observation()->set_value("own-observation");
 	availability->set_based_on_version(1);
 	availability->mutable_eligibility()->set_coverage(COVERAGE_COMPLETE);
 	auto eligibility = availability->mutable_eligibility()->add_items();
@@ -32,7 +34,8 @@ int Publish(const ProviderObservation &observation) {
 OrderRequest Request(const std::string &sessionId, const std::string &requestId) {
 	OrderRequest request;
 	request.set_session_id(sessionId);
-	request.mutable_unit_id()->set_value("own");
+	request.mutable_observer()->set_value("mock-observer");
+	request.mutable_observation()->set_value("own-observation");
 	request.set_based_on_version(1);
 	request.mutable_waypoint()->set_latitude_deg(62);
 	request.mutable_waypoint()->set_longitude_deg(-10);
@@ -41,33 +44,54 @@ OrderRequest Request(const std::string &sessionId, const std::string &requestId)
 }
 }
 
-TEST(Host, VersionBoundsPortAndSessionReset) {
+TEST(Host, VersionBoundsObserverSnapshotAndSessionReset) {
 	EXPECT_EQ(nc_abi_version(), 1);
 	EXPECT_EQ(nc_initialize(2, "127.0.0.1:50058"), 2);
 	ASSERT_EQ(nc_initialize(1, "127.0.0.1:50058"), 0);
 	auto stub = Gateway::NewStub(grpc::CreateChannel("127.0.0.1:50058", grpc::InsecureChannelCredentials()));
 	auto observation = Observation("host-one");
 	ASSERT_EQ(Publish(observation), 0);
+	Session connection;
+	{
+		grpc::ClientContext context;
+		ASSERT_TRUE(stub->Connect(&context, Query{}, &connection).ok());
+	}
+	EXPECT_EQ(connection.schema_version(), 4);
+	EXPECT_EQ(connection.observer().value(), "mock-observer");
+	ObserverSnapshot publicSnapshot;
+	{
+		Query viewQuery;
+		viewQuery.set_session_id(connection.session_id());
+		*viewQuery.mutable_observer() = connection.observer();
+		grpc::ClientContext viewContext;
+		ASSERT_TRUE(stub->GetView(&viewContext, viewQuery, &publicSnapshot).ok());
+	}
+	ASSERT_EQ(publicSnapshot.units_size(), 2);
+	EXPECT_EQ(publicSnapshot.schema_version(), 4);
+	EXPECT_EQ(publicSnapshot.units(0).identity().value(), "own-observation");
+	EXPECT_EQ(publicSnapshot.GetDescriptor()->FindFieldByName("units")->message_type()->FindFieldByName("unit_id"), nullptr);
+
 	auto request = Request("host-one", "r");
 	OrderResult result;
 	{
 		grpc::ClientContext context;
 		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
 		EXPECT_EQ(result.stage(), REQUEST_RECEIVED);
+		EXPECT_EQ(result.observer().value(), "mock-observer");
 	}
 	{
 		grpc::ClientContext context;
 		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
 		EXPECT_EQ(result.stage(), REQUEST_RECEIVED);
 	}
-	request.mutable_unit_id()->set_value("contact");
+	request.mutable_observation()->set_value("ambiguous-observation");
 	request.set_request_id("contact-rejected");
 	{
 		grpc::ClientContext context;
 		ASSERT_TRUE(stub->SubmitOrder(&context, request, &result).ok());
 		EXPECT_EQ(result.reason(), "wrong_side_or_invalid_entity");
 	}
-	request.mutable_unit_id()->set_value("own");
+	request.mutable_observation()->set_value("own-observation");
 	constexpr std::size_t MAXIMUM_ORDER_BYTES = 65'536;
 	uint8_t undersizedBuffer[1];
 	uint8_t buffer[MAXIMUM_ORDER_BYTES];
@@ -78,7 +102,7 @@ TEST(Host, VersionBoundsPortAndSessionReset) {
 	OrderRequest parsed;
 	ASSERT_TRUE(parsed.ParseFromArray(buffer, length));
 	EXPECT_EQ(parsed.request_id(), "r");
-	EXPECT_EQ(parsed.unit_id().value(), observation.snapshot().instances(0).unit_id().value());
+	EXPECT_EQ(parsed.observation().value(), observation.snapshot().units(0).identity().value());
 	EXPECT_EQ(nc_poll_order(buffer, sizeof(buffer), &length), 1);
 	for (int index = 0; index < 65; ++index) {
 		request.set_request_id("queue-" + std::to_string(index));
@@ -150,16 +174,17 @@ TEST(Host, UnknownBlockedAndInvalidPayloadDoNotEnterQueue) {
 	EXPECT_EQ(nc_shutdown(), 0);
 }
 
-TEST(Host, InvalidCompositionIsRejectedWithoutCrossingAbi) {
+TEST(Host, InvalidObservationCompositionIsRejectedWithoutCrossingAbi) {
 	ASSERT_EQ(nc_initialize(1, "127.0.0.1:50058"), 0);
 	auto malformed = Observation("malformed");
-	malformed.mutable_snapshot()->mutable_instances(1)->mutable_equipment()->add_items();
-	EXPECT_EQ(Publish(malformed), 2);
-	malformed.mutable_snapshot()->mutable_instances(1)->mutable_equipment()->clear_items();
-	malformed.mutable_snapshot()->mutable_session()->set_schema_version(2);
+	*malformed.mutable_snapshot()->mutable_units(1)->mutable_identity() =
+		malformed.snapshot().units(0).identity();
 	EXPECT_EQ(Publish(malformed), 2);
 	malformed = Observation("malformed");
 	malformed.mutable_order_availability(0)->set_session_id("foreign-session");
+	EXPECT_EQ(Publish(malformed), 2);
+	malformed = Observation("malformed");
+	malformed.mutable_snapshot()->clear_observer();
 	EXPECT_EQ(Publish(malformed), 2);
 	EXPECT_EQ(nc_shutdown(), 0);
 }

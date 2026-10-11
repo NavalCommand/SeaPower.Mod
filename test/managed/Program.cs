@@ -112,30 +112,35 @@ static class Program
             Directory.CreateDirectory(config.LogDirectory);
             var mailbox = new RuntimeMailbox();
             var transport = new FakeTransport();
+            var observer = new ObserverId { Value = "observer" };
             var observation = new ProviderObservation
             {
-                Snapshot = new WorldSnapshot
+                Snapshot = new ObserverSnapshot
                 {
-                    Session = new Session { SchemaVersion = 3, SessionId = "runtime-session", Ready = true },
-                    ObservationVersion = 1
-                }
+                    SchemaVersion = 4,
+                    SessionId = "runtime-session",
+                    Observer = observer,
+                    Ready = true,
+                    Version = 1
+                },
             };
-            var own = new UnitInstance
+            var own = new UnitObservation
             {
-                UnitId = new UnitId { Value = "own" },
-                Navigation = new NavigationState { PlannedRoute = new RouteKnowledge { Known = new Route() } },
-                Aircraft = new AircraftState { Airborne = new BoolKnowledge { Known = false } },
-                AirOperations = new AirOperations
+                Identity = new ObservationId { Value = "own-observation" },
+                Navigation = new NavigationObservation { PlannedRoute = new RouteKnowledge { Known = new Route() } },
+                Aircraft = new AircraftObservation { Airborne = new BoolKnowledge { Known = false } },
+                AirOperations = new AirOperationsObservation
                 {
                     Inventory = new AircraftInventory { Coverage = CollectionCoverage.CoverageComplete },
                     OnboardCount = new UInt32Knowledge { Known = 0 }
                 }
             };
-            observation.Snapshot.Instances.Add(own);
+            observation.Snapshot.Units.Add(own);
             observation.OrderAvailability.Add(new OrderDiscovery
             {
                 SessionId = "runtime-session",
-                UnitId = own.UnitId.Clone(),
+                Observer = observer.Clone(),
+                Observation = own.Identity.Clone(),
                 BasedOnVersion = 1,
                 Eligibility = new OrderEligibilityState { Coverage = CollectionCoverage.CoverageComplete }
             });
@@ -143,7 +148,7 @@ static class Program
             mailbox.Views.Enqueue(observationBytes);
             mailbox.Results.Enqueue(new OrderResult
             {
-                SessionId = "runtime-session", RequestId = "runtime-command", Stage = Stage.RequestReceived
+                SessionId = "runtime-session", RequestId = "runtime-command", Observer = observer.Clone(), Stage = Stage.RequestReceived
             }.ToByteArray());
             var worker = new Thread(() => TransportWorker.Run(mailbox, config, _ => transport));
             worker.Start();
@@ -151,16 +156,17 @@ static class Program
             Check(!mailbox.Failed, "Retryable publish backpressure preserves pending bytes");
             Check(mailbox.Commands.TryDequeue(out byte[] command), "Worker copies native command bytes");
             var parsedCommand = OrderRequest.Parser.ParseFrom(command);
-            Check(parsedCommand.UnitId.Value == own.UnitId.Value && parsedCommand.PayloadCase == OrderRequest.PayloadOneofCase.Waypoint,
-                "Same observation identity reaches exactly one typed command payload");
+            Check(parsedCommand.Observation.Value == own.Identity.Value && parsedCommand.Observer.Value == observer.Value &&
+                parsedCommand.PayloadCase == OrderRequest.PayloadOneofCase.Waypoint,
+                "Observer-scoped observation identity reaches exactly one typed command payload");
             var published = ProviderObservation.Parser.ParseFrom(transport.LastView);
-            Check(published.Snapshot.Instances[0].Aircraft.Airborne.StateCase == BoolKnowledge.StateOneofCase.Known
-                && !published.Snapshot.Instances[0].Aircraft.Airborne.Known, "Known false survives production transport mailbox");
-            Check(published.Snapshot.Instances[0].AirOperations.OnboardCount.StateCase == UInt32Knowledge.StateOneofCase.Known
-                && published.Snapshot.Instances[0].AirOperations.OnboardCount.Known == 0, "Attached known zero inventory survives mailbox");
-            Check(published.Snapshot.Instances[0].Navigation.PlannedRoute.StateCase == RouteKnowledge.StateOneofCase.Known
-                && published.Snapshot.Instances[0].Navigation.PlannedRoute.Known.Points.Count == 0
-                && published.OrderAvailability.Count == 1, "Known-empty route and separate discovery overlay survive mailbox");
+            Check(published.Snapshot.Units[0].Aircraft.Airborne.StateCase == BoolKnowledge.StateOneofCase.Known
+                && !published.Snapshot.Units[0].Aircraft.Airborne.Known, "Known false survives production transport mailbox");
+            Check(published.Snapshot.Units[0].AirOperations.OnboardCount.StateCase == UInt32Knowledge.StateOneofCase.Known
+                && published.Snapshot.Units[0].AirOperations.OnboardCount.Known == 0, "Observed known zero inventory survives mailbox");
+            Check(published.Snapshot.Units[0].Navigation.PlannedRoute.StateCase == RouteKnowledge.StateOneofCase.Known
+                && published.Snapshot.Units[0].Navigation.PlannedRoute.Known.Points.Count == 0
+                && published.OrderAvailability.Count == 1, "Known-empty route and separate observer-scoped discovery overlay survive mailbox");
             mailbox.Stop = true;
             Wait(() => mailbox.Completed);
             Check(worker.Join(1000) && transport.Stops == 1, "Orderly off-thread shutdown happens once");
@@ -220,7 +226,8 @@ static class Program
             }
             byte[] command = new OrderRequest
             {
-                SessionId = "runtime-session", RequestId = "runtime-command", UnitId = new UnitId { Value = "own" },
+                SessionId = "runtime-session", RequestId = "runtime-command",
+                Observer = new ObserverId { Value = "observer" }, Observation = new ObservationId { Value = "own-observation" },
                 BasedOnVersion = 1, Waypoint = new Waypoint { LatitudeDeg = 62, LongitudeDeg = -10 }
             }.ToByteArray();
             Buffer.BlockCopy(command, 0, buffer, 0, command.Length);

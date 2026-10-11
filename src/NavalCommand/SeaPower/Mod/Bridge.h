@@ -20,8 +20,7 @@ class Bridge final : public Gateway::Api::IProvider {
 	static constexpr uint64_t MAXIMUM_OBSERVATION_AGE_VERSIONS = 20;
 	static constexpr double MAXIMUM_LATITUDE_DEGREES = 90;
 	static constexpr double MAXIMUM_LONGITUDE_DEGREES = 180;
-	static constexpr uint32_t CANONICAL_SCHEMA_VERSION = 3;
-
+	static constexpr uint32_t CANONICAL_SCHEMA_VERSION = 4;
 	std::mutex m_Mutex;
 	Gateway::Api::ProviderObservation m_Observation;
 	std::deque<std::string> m_Commands;
@@ -41,7 +40,13 @@ public:
 		using namespace Orders::Api;
 		const auto &snapshot = m_Observation.Snapshot;
 		auto reject = [&](const char *reason) {
-			return Result{request.SessionId, request.RequestId, Stage::Rejected, reason};
+			Result result;
+			result.SessionId = request.SessionId;
+			result.RequestId = request.RequestId;
+			result.Observer = snapshot.Observer;
+			result.Stage = Stage::Rejected;
+			result.Reason = reason;
+			return result;
 		};
 		if (!snapshot.Ready) {
 			return reject("provider_not_ready");
@@ -49,31 +54,44 @@ public:
 		if (request.SessionId != snapshot.SessionId) {
 			return reject("stale_session");
 		}
+		if (request.Observer != snapshot.Observer) {
+			return reject("wrong_observer_or_invalid_entity");
+		}
 		if (auto retained = m_Ledger.find(request.RequestId); retained != m_Ledger.end()) {
 			return retained->second;
 		}
-		if (request.RequestId.empty() || request.RequestId.size() > MAXIMUM_ID_CHARACTERS || request.Unit.Value.empty() || request.Unit.Value.size() > MAXIMUM_ID_CHARACTERS) {
+		if (request.RequestId.empty() || request.RequestId.size() > MAXIMUM_ID_CHARACTERS ||
+			request.Observation.Value.empty() || request.Observation.Value.size() > MAXIMUM_ID_CHARACTERS) {
 			return reject("invalid_arguments");
 		}
 		if (m_Ledger.size() >= MAXIMUM_RETAINED_REQUESTS) {
 			return reject("ledger_full");
 		}
-		auto result = Result{request.SessionId, request.RequestId, Stage::Received, "mailbox_received"};
+		Result result;
+		result.SessionId = request.SessionId;
+		result.RequestId = request.RequestId;
+		result.Observer = request.Observer;
+		result.Stage = Stage::Received;
+		result.Reason = "mailbox_received";
 		const auto route = std::get_if<RouteCommand>(&request.Payload);
-		const auto launch = std::get_if<FacilityLaunch>(&request.Payload);
-		const auto overlay = std::ranges::find_if(m_Observation.OrderAvailability, [&](const auto &entry) { return entry.Unit == request.Unit; });
-		if (!std::ranges::any_of(snapshot.Instances, [&](const auto &unit) { return unit.Identity == request.Unit; }) || overlay == m_Observation.OrderAvailability.end()) {
+		const auto launch = std::get_if<LaunchAircraft>(&request.Payload);
+		const auto overlay = std::ranges::find_if(m_Observation.OrderAvailability, [&](const auto &entry) {
+			return entry.Observer == request.Observer && entry.Observation == request.Observation;
+		});
+		if (!std::ranges::any_of(snapshot.Units, [&](const auto &unit) { return unit.Identity == request.Observation; }) ||
+			overlay == m_Observation.OrderAvailability.end()) {
 			result = reject("wrong_side_or_invalid_entity");
 		} else if (route && (!std::isfinite(route->Latitude.Value) || !std::isfinite(route->Longitude.Value) ||
 			std::abs(route->Latitude.Value) > MAXIMUM_LATITUDE_DEGREES || std::abs(route->Longitude.Value) > MAXIMUM_LONGITUDE_DEGREES)) {
 			result = reject("invalid_arguments");
-		} else if (launch && (launch->Count != 1 || launch->Aircraft.TypeId.Value.empty() || launch->Aircraft.Squadron.empty() || launch->Aircraft.Loadout.Value.empty() ||
-			launch->Aircraft.TypeId.Value.size() > MAXIMUM_ID_CHARACTERS || launch->Aircraft.Squadron.size() > MAXIMUM_ID_CHARACTERS ||
-			launch->Aircraft.Loadout.Value.size() > MAXIMUM_ID_CHARACTERS)) {
+		} else if (launch && (launch->Count != 1 || launch->Aircraft.Type.Value.empty() || launch->Aircraft.Squadron.empty() ||
+			launch->Aircraft.Loadout.Value.empty() || launch->Aircraft.Type.Value.size() > MAXIMUM_ID_CHARACTERS ||
+			launch->Aircraft.Squadron.size() > MAXIMUM_ID_CHARACTERS || launch->Aircraft.Loadout.Value.size() > MAXIMUM_ID_CHARACTERS)) {
 			result = reject("invalid_arguments");
 		} else if (route && route->Mode != RouteMode::IdleWaypoint && route->Mode != RouteMode::ReplaceRoute && route->Mode != RouteMode::AppendWaypoint) {
 			result = reject("unsupported_route_mode");
-		} else if (request.BasedOnVersion == 0 || request.BasedOnVersion > snapshot.Version || snapshot.Version - request.BasedOnVersion > MAXIMUM_OBSERVATION_AGE_VERSIONS) {
+		} else if (request.BasedOnVersion == 0 || request.BasedOnVersion > snapshot.Version ||
+			snapshot.Version - request.BasedOnVersion > MAXIMUM_OBSERVATION_AGE_VERSIONS) {
 			result = reject("stale_observation");
 		} else if (overlay->Orders.GetCoverage() == Uncertainty::Api::ObservedCollection<Eligibility>::Coverage::Unknown) {
 			result = reject("order_availability_unknown");
@@ -84,17 +102,18 @@ public:
 				if (entry.Kind != kind) {
 					return false;
 				}
-				return !launch || (entry.LaunchOption && entry.LaunchOption->Aircraft.TypeId == launch->Aircraft.TypeId &&
-					entry.LaunchOption->Aircraft.Squadron == launch->Aircraft.Squadron && entry.LaunchOption->Aircraft.Loadout == launch->Aircraft.Loadout);
+				return !launch || (entry.LaunchOption && entry.LaunchOption->Aircraft.Type == launch->Aircraft.Type &&
+					entry.LaunchOption->Aircraft.Squadron == launch->Aircraft.Squadron &&
+					entry.LaunchOption->Aircraft.Loadout == launch->Aircraft.Loadout);
 			});
 			if (launch && eligibility == overlay->Orders.Items().end()) {
-				// Invalid selectors still reach the authoritative native validator.
+				// Invalid selectors still reach the authoritative game-thread validator.
 				eligibility = std::ranges::find_if(overlay->Orders.Items(), [&](const auto &entry) {
 					return entry.Kind == kind && entry.Availability == Availability::Executable;
 				});
 			}
-			// Only the provider's separate current availability supplies mailbox permission.
-			// The game-thread adapter must still revalidate current faction and native safety.
+			// This is a mailbox gate only. The game-thread adapter must independently
+			// revalidate the current observer, faction control, source mapping and native safety.
 			if (eligibility == overlay->Orders.Items().end()) {
 				result = reject(overlay->Orders.GetCoverage() == Uncertainty::Api::ObservedCollection<Eligibility>::Coverage::Complete ?
 					"unsupported_order" : "order_availability_unknown");
@@ -113,18 +132,30 @@ public:
 	Orders::Api::Result Status(const std::string &sessionId, const std::string &requestId) override {
 		std::lock_guard lock(m_Mutex);
 		if (sessionId != m_Observation.Snapshot.SessionId) {
-			return {sessionId, requestId, Orders::Api::Stage::Rejected, "stale_session"};
+			Orders::Api::Result result;
+			result.SessionId = sessionId;
+			result.RequestId = requestId;
+			result.Observer = m_Observation.Snapshot.Observer;
+			result.Stage = Orders::Api::Stage::Rejected;
+			result.Reason = "stale_session";
+			return result;
 		}
 		if (auto retained = m_Ledger.find(requestId); retained != m_Ledger.end()) {
 			return retained->second;
 		}
-		return {sessionId, requestId, Orders::Api::Stage::Unknown, "unknown_or_expired_request"};
+		Orders::Api::Result result;
+		result.SessionId = sessionId;
+		result.RequestId = requestId;
+		result.Observer = m_Observation.Snapshot.Observer;
+		result.Stage = Orders::Api::Stage::Unknown;
+		result.Reason = "unknown_or_expired_request";
+		return result;
 	}
 
 	int PublishView(const uint8_t *buffer, uint32_t length) {
 		Gateway::Api::Wire::ProviderObservation wireValue;
-		if (!buffer || length > MAXIMUM_SNAPSHOT_BYTES || !wireValue.ParseFromArray(buffer, length) ||
-			!wireValue.has_snapshot() || wireValue.snapshot().session().schema_version() != CANONICAL_SCHEMA_VERSION) {
+		if (!buffer || length > MAXIMUM_SNAPSHOT_BYTES || !wireValue.ParseFromArray(buffer, length) || !wireValue.has_snapshot() ||
+			wireValue.snapshot().schema_version() != CANONICAL_SCHEMA_VERSION) {
 			return 2;
 		}
 		Gateway::Api::ProviderObservation observation;
@@ -137,7 +168,8 @@ public:
 		if (!lock) {
 			return 1;
 		}
-		if (observation.Snapshot.SessionId != m_Observation.Snapshot.SessionId || !observation.Snapshot.Ready) {
+		if (observation.Snapshot.SessionId != m_Observation.Snapshot.SessionId ||
+			observation.Snapshot.Observer != m_Observation.Snapshot.Observer || !observation.Snapshot.Ready) {
 			m_Commands.clear();
 			m_Ledger.clear();
 		}
@@ -160,7 +192,8 @@ public:
 		if (!lock) {
 			return 1;
 		}
-		if (result.SessionId != m_Observation.Snapshot.SessionId || !m_Ledger.contains(result.RequestId)) {
+		if (result.SessionId != m_Observation.Snapshot.SessionId || result.Observer != m_Observation.Snapshot.Observer ||
+			!m_Ledger.contains(result.RequestId)) {
 			return 2;
 		}
 		m_Ledger[result.RequestId] = std::move(result);
