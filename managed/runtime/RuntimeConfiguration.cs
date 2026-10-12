@@ -14,8 +14,7 @@ public sealed class RuntimeConfiguration
     [DataMember(Name = "enabledByDefault", IsRequired = true)] public bool Enabled { get; set; }
     [DataMember(Name = "endpoint", IsRequired = true)] public string Endpoint { get; set; }
     [DataMember(Name = "maxMessageBytes", IsRequired = true)] public int MaximumMessageBytes { get; set; }
-    [DataMember(Name = "maxQueuedOrders", IsRequired = true)] public int MaximumQueuedOrders { get; set; }
-    [DataMember(Name = "maxRetainedRequests", IsRequired = true)] public int MaximumRetainedRequests { get; set; }
+    [DataMember(Name = "maxQueuedControls", IsRequired = true)] public int MaximumQueuedControls { get; set; }
     [DataMember(Name = "clientAutoLaunch", IsRequired = true)] public bool ClientAutoLaunch { get; set; }
     [DataMember(Name = "nativeLibrary")] public string NativeLibrary { get; set; }
     [DataMember(Name = "logDirectory")] public string LogDirectory { get; set; }
@@ -29,7 +28,7 @@ public sealed class RuntimeConfiguration
         }
         using var stream = File.OpenRead(configPath);
         var configuration = (RuntimeConfiguration)new DataContractJsonSerializer(typeof(RuntimeConfiguration)).ReadObject(stream);
-        if (configuration == null || configuration.Schema != 1 || configuration.Abi != 1)
+        if (configuration == null || configuration.Schema != 2 || configuration.Abi != 2)
         {
             throw new InvalidDataException("Unsupported configuration schema or ABI.");
         }
@@ -48,8 +47,7 @@ public sealed class RuntimeConfiguration
             throw new ArgumentException("A loopback endpoint with port 1024..65535 is required.");
         }
         // These existing ABI/provider bounds are fixed, not configurable capacities.
-        if (configuration.MaximumMessageBytes != 1_048_576 || configuration.MaximumQueuedOrders != 64
-            || configuration.MaximumRetainedRequests != 128 || configuration.ClientAutoLaunch)
+        if (configuration.MaximumMessageBytes != 16_777_216 || configuration.MaximumQueuedControls != 64 || configuration.ClientAutoLaunch)
         {
             throw new ArgumentException("Unsupported queue/message limits or automatic client launch.");
         }

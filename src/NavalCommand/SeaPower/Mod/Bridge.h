@@ -1,222 +1,214 @@
 #pragma once
+#include <NavalCommand/Error/Api/MakeError.h>
 #include <NavalCommand/Gateway/Api/Codec.h>
-#include <NavalCommand/Orders/Api/ExecutionRequest.h>
-#include <algorithm>
-#include <cmath>
-#include <cstdint>
+#include <NavalCommand/Gateway/Api/IProvider.h>
+#include <atomic>
+#include <condition_variable>
 #include <cstring>
 #include <deque>
 #include <map>
 #include <mutex>
+#include <set>
 
-namespace NavalCommand::SeaPower::Mod {
-// I/O-side mailbox only. Serialized publications become owned values, never game objects.
-class Bridge final : public Gateway::Api::IProvider {
-	static constexpr uint32_t MAXIMUM_ORDER_BYTES = 65'536;
-	static constexpr uint32_t MAXIMUM_SNAPSHOT_BYTES = 1'048'576;
-	static constexpr std::size_t MAXIMUM_RETAINED_REQUESTS = 128;
-	static constexpr std::size_t MAXIMUM_ID_CHARACTERS = 128;
-	static constexpr std::size_t MAXIMUM_QUEUED_COMMANDS = 64;
-	static constexpr uint64_t MAXIMUM_OBSERVATION_AGE_VERSIONS = 20;
-	static constexpr double MAXIMUM_LATITUDE_DEGREES = 90;
-	static constexpr double MAXIMUM_LONGITUDE_DEGREES = 180;
-	static constexpr uint32_t CANONICAL_SCHEMA_VERSION = 4;
-	std::mutex m_Mutex;
-	Gateway::Api::ProviderObservation m_Observation;
-	std::deque<std::string> m_Commands;
-	std::map<std::string, Orders::Api::Result> m_Ledger;
+namespace NavalCommand::SeaPower::Mod
+{
+	namespace Wire = Gateway::Api::Wire;
 
-public:
-	std::expected<Gateway::Api::ProviderObservation, Gateway::Api::Error> View() override {
-		std::lock_guard lock(m_Mutex);
-		if (!m_Observation.Snapshot.Ready) {
-			return std::unexpected(Gateway::Api::Error::NotReady);
-		}
-		return m_Observation;
-	}
-
-	Orders::Api::Result Submit(const Orders::Api::ExecutionRequest &request) override {
-		std::lock_guard lock(m_Mutex);
-		using namespace Orders::Api;
-		const auto &snapshot = m_Observation.Snapshot;
-		auto reject = [&](const char *reason) {
-			Result result;
-			result.SessionId = request.SessionId;
-			result.RequestId = request.RequestId;
-			result.Observer = snapshot.Observer;
-			result.Stage = Stage::Rejected;
-			result.Reason = reason;
-			return result;
+	// Worker-side owned messages only. No Unity objects or callbacks enter here.
+	class Bridge final : public Gateway::Api::IProvider
+	{
+		static constexpr std::size_t MAXIMUM_PENDING = 64;
+		static constexpr std::uint32_t MAXIMUM_MESSAGE_BYTES = 16 * 1024 * 1024;
+		struct Pending
+		{
+			Wire::Control Control;
+			std::chrono::steady_clock::time_point Deadline;
+			std::optional<Wire::Result> Result;
 		};
-		if (!snapshot.Ready) {
-			return reject("provider_not_ready");
+		mutable std::mutex m_Mutex;
+		std::condition_variable m_Changed;
+		std::shared_ptr<const Wire::Publication> m_Publication;
+		std::deque<std::shared_ptr<Pending>> m_Queue;
+		std::map<std::string, std::shared_ptr<Pending>> m_Pending;
+		std::set<std::string> m_Disconnected;
+		std::set<std::string> m_PauseClaimClients;
+		std::uint64_t m_NextRequest{};
+		bool m_Stopped{};
+
+	public:
+		std::shared_ptr<const Wire::Publication> Publication() const override
+		{
+			std::lock_guard lock{m_Mutex};
+			return m_Publication;
 		}
-		if (request.SessionId != snapshot.SessionId) {
-			return reject("stale_session");
+
+		Error::Api::Result<Wire::Result> Apply(const Wire::Control& source, std::chrono::steady_clock::time_point deadline) override
+		{
+			std::unique_lock lock{m_Mutex};
+			while (!m_Queue.empty() && (!m_Pending.contains(m_Queue.front()->Control.request()) || std::chrono::steady_clock::now() >= m_Queue.front()->Deadline))
+			{
+				m_Queue.pop_front();
+			}
+			if (m_Stopped || !m_Publication || source.session() != m_Publication->session())
+			{
+				return std::unexpected(Error::Api::MakeError(Error::Api::ErrorCondition::NotReady));
+			}
+			if (m_Pending.size() >= MAXIMUM_PENDING)
+			{
+				return std::unexpected(Error::Api::MakeError(Error::Api::ErrorCondition::ResourceExhausted));
+			}
+			if (deadline <= std::chrono::steady_clock::now())
+			{
+				return std::unexpected(Error::Api::MakeError(Error::Api::ErrorCondition::CommunicationError));
+			}
+			auto pending = std::make_shared<Pending>();
+			pending->Control = source;
+			pending->Control.set_request(std::to_string(++m_NextRequest));
+			pending->Deadline = deadline;
+			const auto wallDeadline = std::chrono::system_clock::now() + (deadline - std::chrono::steady_clock::now());
+			pending->Control.set_expires_unix_milliseconds(std::chrono::duration_cast<std::chrono::milliseconds>(wallDeadline.time_since_epoch()).count());
+			const auto request = pending->Control.request();
+			m_Pending.emplace(request, pending);
+			m_Queue.push_back(pending);
+			m_Changed.wait_until(lock,
+								 deadline,
+								 [&]
+								 {
+									 return m_Stopped || pending->Result.has_value();
+								 });
+			m_Pending.erase(request);
+			if (pending->Result)
+			{
+				return *pending->Result;
+			}
+			return std::unexpected(Error::Api::MakeError(m_Stopped ? Error::Api::ErrorCondition::NotReady : Error::Api::ErrorCondition::CommunicationError));
 		}
-		if (request.Observer != snapshot.Observer) {
-			return reject("wrong_observer_or_invalid_entity");
+
+		void Disconnected(const std::string& client) override
+		{
+			std::lock_guard lock{m_Mutex};
+			// At most sixteen connected clients. Separate priority channel cannot
+			// lose a release when the ordinary control queue is full.
+			if (m_PauseClaimClients.erase(client) != 0)
+			{
+				m_Disconnected.insert(client);
+			}
 		}
-		if (auto retained = m_Ledger.find(request.RequestId); retained != m_Ledger.end()) {
-			return retained->second;
-		}
-		if (request.RequestId.empty() || request.RequestId.size() > MAXIMUM_ID_CHARACTERS ||
-			request.Observation.Value.empty() || request.Observation.Value.size() > MAXIMUM_ID_CHARACTERS) {
-			return reject("invalid_arguments");
-		}
-		if (m_Ledger.size() >= MAXIMUM_RETAINED_REQUESTS) {
-			return reject("ledger_full");
-		}
-		Result result;
-		result.SessionId = request.SessionId;
-		result.RequestId = request.RequestId;
-		result.Observer = request.Observer;
-		result.Stage = Stage::Received;
-		result.Reason = "mailbox_received";
-		const auto route = std::get_if<RouteCommand>(&request.Payload);
-		const auto launch = std::get_if<LaunchAircraft>(&request.Payload);
-		const auto overlay = std::ranges::find_if(m_Observation.OrderAvailability, [&](const auto &entry) {
-			return entry.Observer == request.Observer && entry.Observation == request.Observation;
-		});
-		if (!std::ranges::any_of(snapshot.Units, [&](const auto &unit) { return unit.Identity == request.Observation; })) {
-			result = reject("wrong_side_or_invalid_entity");
-		} else if (overlay == m_Observation.OrderAvailability.end()) {
-			result = reject("order_availability_unknown");
-		} else if (route && (!std::isfinite(route->Latitude.Value) || !std::isfinite(route->Longitude.Value) ||
-			std::abs(route->Latitude.Value) > MAXIMUM_LATITUDE_DEGREES || std::abs(route->Longitude.Value) > MAXIMUM_LONGITUDE_DEGREES)) {
-			result = reject("invalid_arguments");
-		} else if (launch && (launch->Count != 1 || launch->Aircraft.Type.Value.empty() || launch->Aircraft.Squadron.empty() ||
-			launch->Aircraft.Loadout.Value.empty() || launch->Aircraft.Type.Value.size() > MAXIMUM_ID_CHARACTERS ||
-			launch->Aircraft.Squadron.size() > MAXIMUM_ID_CHARACTERS || launch->Aircraft.Loadout.Value.size() > MAXIMUM_ID_CHARACTERS)) {
-			result = reject("invalid_arguments");
-		} else if (route && route->Mode != RouteMode::IdleWaypoint && route->Mode != RouteMode::ReplaceRoute && route->Mode != RouteMode::AppendWaypoint) {
-			result = reject("unsupported_route_mode");
-		} else if (request.BasedOnVersion == 0 || request.BasedOnVersion > snapshot.Version ||
-			snapshot.Version - request.BasedOnVersion > MAXIMUM_OBSERVATION_AGE_VERSIONS) {
-			result = reject("stale_observation");
-		} else {
-			const auto kind = launch ? OrderKind::LaunchAircraft : route->Mode == RouteMode::ReplaceRoute ? OrderKind::ReplaceRoute :
-				route->Mode == RouteMode::AppendWaypoint ? OrderKind::AppendRoute : OrderKind::IdleWaypoint;
-			auto eligibility = std::ranges::find_if(overlay->Orders, [&](const auto &entry) {
-				if (entry.Kind != kind) {
-					return false;
+
+		int PublishView(const std::uint8_t* bytes, std::uint32_t length)
+		{
+			if ((!bytes && length != 0) || length > MAXIMUM_MESSAGE_BYTES)
+			{
+				return 2;
+			}
+			auto publication = std::make_shared<Wire::Publication>();
+			if (length != 0 && !publication->ParseFromArray(bytes, static_cast<int>(length)))
+			{
+				return 2;
+			}
+			std::set<std::string> scopes;
+			for (const auto& view : publication->views())
+			{
+				if (view.scope().kind_case() == Wire::Scope::KIND_NOT_SET || (view.scope().has_faction() && view.scope().faction().empty()))
+				{
+					return 2;
 				}
-				return !launch || (entry.LaunchOption && entry.LaunchOption->Aircraft.Type == launch->Aircraft.Type &&
-					entry.LaunchOption->Aircraft.Squadron == launch->Aircraft.Squadron &&
-					entry.LaunchOption->Aircraft.Loadout == launch->Aircraft.Loadout);
-			});
-			if (launch && eligibility == overlay->Orders.end()) {
-				// Invalid selectors still reach the authoritative game-thread validator.
-				eligibility = std::ranges::find_if(overlay->Orders, [&](const auto &entry) {
-					return entry.Kind == kind && entry.Availability == Availability::Executable;
-				});
+				const auto key = view.scope().has_faction() ? "faction:" + view.scope().faction() : "omniscient";
+				if (!scopes.insert(key).second)
+				{
+					return 2;
+				}
+				for (const auto& entry : view.entries())
+				{
+					if (view.scope().has_faction() && ((entry.result().has_unit() && entry.result().unit().faction() != view.scope().faction()) ||
+													   (entry.result().has_observation() && entry.result().observation().observer_faction() != view.scope().faction())))
+					{
+						return 2;
+					}
+				}
 			}
-			// This is a mailbox gate only. The game-thread adapter must independently
-			// revalidate the current observer, faction control, source mapping and native safety.
-			if (eligibility == overlay->Orders.end()) {
-				result = reject("order_availability_unknown");
-			} else if (eligibility->Availability == Availability::Unsupported) {
-				result = reject(eligibility->Reason.empty() ? "unsupported_order" : eligibility->Reason.c_str());
-			} else if (eligibility->Availability != Availability::Executable) {
-				result = reject(eligibility->Reason.empty() ? "order_availability_unknown" : eligibility->Reason.c_str());
-			} else if (m_Commands.size() >= MAXIMUM_QUEUED_COMMANDS) {
-				result = reject("queue_full");
-			} else {
-				m_Commands.push_back(Gateway::Api::Encode(request).SerializeAsString());
+			std::lock_guard lock{m_Mutex};
+			if (m_Publication && m_Publication->session() != publication->session())
+			{
+				m_PauseClaimClients.clear();
 			}
+			m_Publication = std::move(publication);
+			return 0;
 		}
-		m_Ledger[request.RequestId] = result;
-		return result;
-	}
 
-	Orders::Api::Result Status(const std::string &sessionId, const std::string &requestId) override {
-		std::lock_guard lock(m_Mutex);
-		if (sessionId != m_Observation.Snapshot.SessionId) {
-			Orders::Api::Result result;
-			result.SessionId = sessionId;
-			result.RequestId = requestId;
-			result.Observer = m_Observation.Snapshot.Observer;
-			result.Stage = Orders::Api::Stage::Rejected;
-			result.Reason = "stale_session";
-			return result;
+		int PublishResult(const std::uint8_t* bytes, std::uint32_t length)
+		{
+			Wire::ControlResult result;
+			if (!bytes || length == 0 || length > MAXIMUM_MESSAGE_BYTES || !result.ParseFromArray(bytes, static_cast<int>(length)) || !result.has_result())
+			{
+				return 2;
+			}
+			std::lock_guard lock{m_Mutex};
+			auto pending = m_Pending.find(result.request());
+			if (pending == m_Pending.end())
+			{
+				return 2;
+			}
+			pending->second->Result = result.result();
+			m_Changed.notify_all();
+			return 0;
 		}
-		if (auto retained = m_Ledger.find(requestId); retained != m_Ledger.end()) {
-			return retained->second;
-		}
-		Orders::Api::Result result;
-		result.SessionId = sessionId;
-		result.RequestId = requestId;
-		result.Observer = m_Observation.Snapshot.Observer;
-		result.Stage = Orders::Api::Stage::Unknown;
-		result.Reason = "unknown_or_expired_request";
-		return result;
-	}
 
-	int PublishView(const uint8_t *buffer, uint32_t length) {
-		Gateway::Api::Wire::ProviderObservation wireValue;
-		if (!buffer || length > MAXIMUM_SNAPSHOT_BYTES || !wireValue.ParseFromArray(buffer, length) || !wireValue.has_snapshot() ||
-			wireValue.snapshot().schema_version() != CANONICAL_SCHEMA_VERSION) {
-			return 2;
+		int Poll(std::uint8_t* destination, std::uint32_t capacity, std::uint32_t* length)
+		{
+			if (!destination || !length)
+			{
+				return 2;
+			}
+			std::lock_guard lock{m_Mutex};
+			*length = 0;
+			Wire::Control control;
+			const bool release = !m_Disconnected.empty();
+			if (release)
+			{
+				control.set_client(*m_Disconnected.begin());
+				control.mutable_disconnected();
+			}
+			else
+			{
+				while (!m_Queue.empty() && (!m_Pending.contains(m_Queue.front()->Control.request()) || std::chrono::steady_clock::now() >= m_Queue.front()->Deadline))
+				{
+					m_Queue.pop_front();
+				}
+				if (m_Queue.empty())
+				{
+					return 1;
+				}
+				control = m_Queue.front()->Control;
+			}
+			const auto serialized = control.SerializeAsString();
+			*length = static_cast<std::uint32_t>(serialized.size());
+			if (serialized.size() > capacity)
+			{
+				return 2;
+			}
+			std::memcpy(destination, serialized.data(), serialized.size());
+			if (release)
+			{
+				m_Disconnected.erase(m_Disconnected.begin());
+			}
+			else
+			{
+				if (control.has_pause() && control.pause())
+				{
+					m_PauseClaimClients.insert(control.client());
+				}
+				m_Queue.pop_front();
+			}
+			return 0;
 		}
-		Gateway::Api::ProviderObservation observation;
-		try {
-			observation = Gateway::Api::Decode(wireValue);
-		} catch (const std::invalid_argument &) {
-			return 2;
-		}
-		std::unique_lock lock(m_Mutex, std::try_to_lock);
-		if (!lock) {
-			return 1;
-		}
-		if (observation.Snapshot.SessionId != m_Observation.Snapshot.SessionId ||
-			observation.Snapshot.Observer != m_Observation.Snapshot.Observer || !observation.Snapshot.Ready) {
-			m_Commands.clear();
-			m_Ledger.clear();
-		}
-		m_Observation = std::move(observation);
-		return 0;
-	}
 
-	int PublishResult(const uint8_t *buffer, uint32_t length) {
-		Gateway::Api::Wire::OrderResult wireValue;
-		if (!buffer || length > MAXIMUM_ORDER_BYTES || !wireValue.ParseFromArray(buffer, length)) {
-			return 2;
+		void Stop()
+		{
+			std::lock_guard lock{m_Mutex};
+			m_Stopped = true;
+			m_Publication.reset();
+			m_Changed.notify_all();
 		}
-		Orders::Api::Result result;
-		try {
-			result = Gateway::Api::Decode(wireValue);
-		} catch (const std::invalid_argument &) {
-			return 2;
-		}
-		std::unique_lock lock(m_Mutex, std::try_to_lock);
-		if (!lock) {
-			return 1;
-		}
-		if (result.SessionId != m_Observation.Snapshot.SessionId || result.Observer != m_Observation.Snapshot.Observer ||
-			!m_Ledger.contains(result.RequestId)) {
-			return 2;
-		}
-		m_Ledger[result.RequestId] = std::move(result);
-		return 0;
-	}
-
-	int Poll(uint8_t *buffer, uint32_t capacity, uint32_t *length) {
-		if (!length || !buffer || capacity > MAXIMUM_ORDER_BYTES) {
-			return 2;
-		}
-		*length = 0;
-		std::unique_lock lock(m_Mutex, std::try_to_lock);
-		if (!lock || m_Commands.empty()) {
-			return 1;
-		}
-		const auto &bytes = m_Commands.front();
-		*length = static_cast<uint32_t>(bytes.size());
-		if (capacity < bytes.size()) {
-			return 2;
-		}
-		std::memcpy(buffer, bytes.data(), bytes.size());
-		m_Commands.pop_front();
-		return 0;
-	}
-};
+	};
 }

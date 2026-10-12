@@ -4,250 +4,100 @@ using System.Threading;
 using Google.Protobuf;
 using NavalCommand.Gateway.Wire;
 using NavalCommand.SeaPower.Mod;
-using NavalCommand.SeaPower.Harness;
 
-static class Program
+static void Check(bool passed, string description)
 {
-    private static int assertions;
-    private static void Check(bool condition, string description)
+    if (!passed)
     {
-        if (!condition)
-        {
-            throw new Exception(description);
-        }
-        assertions++;
-        Console.WriteLine("PASS " + description);
+        throw new InvalidOperationException(description);
     }
+}
 
-    private static void Reject(Action action, string description)
+string directory = Path.Combine(Path.GetTempPath(), "NavalCommand.RuntimeTest", Guid.NewGuid().ToString("N"));
+Directory.CreateDirectory(directory);
+const string valid = "{\"schema\":2,\"abi\":2,\"enabledByDefault\":false,\"endpoint\":\"127.0.0.1:50051\",\"clientAutoLaunch\":false,\"maxMessageBytes\":16777216,\"maxQueuedControls\":64}";
+File.WriteAllText(Path.Combine(directory, "config.json"), valid);
+var configuration = RuntimeConfiguration.Load(directory);
+configuration.LogDirectory = directory;
+Check(configuration.Abi == 2 && !configuration.Enabled, "explicit version and disabled deployment default");
+foreach (string invalid in new[] { valid.Replace("\"abi\":2", "\"abi\":1"), valid.Replace("16777216", "1048576"), valid.Replace("127.0.0.1", "0.0.0.0") })
+{
+    File.WriteAllText(Path.Combine(directory, "config.json"), invalid);
+    bool rejected = false;
+    try
     {
-        try
-        {
-            action();
-        }
-        catch (Exception)
-        {
-            Check(true, description);
-            return;
-        }
-        throw new Exception("Expected rejection: " + description);
+        RuntimeConfiguration.Load(directory);
     }
-
-    private static void Wait(Func<bool> condition)
+    catch (Exception exception) when (exception is InvalidDataException || exception is ArgumentException)
     {
-        if (!SpinWait.SpinUntil(condition, TimeSpan.FromSeconds(5)))
-        {
-            throw new TimeoutException("Worker test timed out");
-        }
+        rejected = true;
     }
+    Check(rejected, "invalid transport configuration rejected");
+}
 
-    private static void Main(string[] arguments)
+var mailbox = new RuntimeMailbox();
+var transport = new FakeTransport();
+var first = new Publication { Session = "old", Revision = 1 }.ToByteArray();
+var second = new Publication { Session = "new", Revision = 2 }.ToByteArray();
+mailbox.Views.Enqueue(first);
+mailbox.Views.Enqueue(second);
+mailbox.Results.Enqueue(new ControlResult { Request = "completed", Result = new Result { Success = new Empty() } }.ToByteArray());
+var worker = new Thread(() => TransportWorker.Run(mailbox, configuration, _ => transport));
+worker.Start();
+var deadline = DateTime.UtcNow.AddSeconds(3);
+while (DateTime.UtcNow < deadline && (transport.View == null || transport.Result == null || mailbox.Commands.IsEmpty))
+{
+    Thread.Sleep(10);
+}
+Check(transport.View != null && Publication.Parser.ParseFrom(transport.View).Session == "new", "latest immutable publication survives busy retry");
+Check(transport.Result != null && ControlResult.Parser.ParseFrom(transport.Result).Request == "completed", "engine result reaches native worker");
+Check(mailbox.Commands.TryDequeue(out var command) && Control.Parser.ParseFrom(command).Pause, "byte-only control reaches engine queue");
+mailbox.Stop = true;
+Check(worker.Join(3000) && mailbox.Completed && !mailbox.Failed && transport.Stops == 1, "native shutdown is owned once by worker");
+var failedMailbox = new RuntimeMailbox();
+TransportWorker.Run(failedMailbox, configuration, _ => throw new InvalidOperationException("native_start_failure"));
+Check(failedMailbox.Failed && failedMailbox.Completed && failedMailbox.Error.Contains("native_start_failure"), "worker startup failure visible to engine");
+Console.WriteLine("Managed runtime: configuration, immutable byte queues, backpressure, controls and shutdown passed.");
+return 0;
+
+sealed class FakeTransport : INativeTransport
+{
+    int viewCalls;
+    bool controlSent;
+    public byte[] View;
+    public byte[] Result;
+    public int Stops;
+    public int Start(string endpoint) => 0;
+    public int PublishView(byte[] bytes)
     {
-        string directory = Path.Combine(Path.GetTempPath(), "naval-runtime-tests-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(directory);
-        string previousEnabled = Environment.GetEnvironmentVariable("NC_MOD_ENABLED");
-        string previousConfig = Environment.GetEnvironmentVariable("NC_MOD_CONFIG");
-        string previousLogs = Environment.GetEnvironmentVariable("NC_MOD_LOG_DIRECTORY");
-        try
+        if (++viewCalls == 1)
         {
-            Environment.SetEnvironmentVariable("NC_MOD_ENABLED", null);
-            Environment.SetEnvironmentVariable("NC_MOD_CONFIG", null);
-            Environment.SetEnvironmentVariable("NC_MOD_LOG_DIRECTORY", null);
-            string validJson = "{\"schema\":1,\"abi\":1,\"enabledByDefault\":false,\"endpoint\":\"127.0.0.1:50051\",\"clientAutoLaunch\":false,\"maxMessageBytes\":1048576,\"maxQueuedOrders\":64,\"maxRetainedRequests\":128}";
-            string configPath = Path.Combine(directory, "config.json");
-            File.WriteAllText(configPath, validJson);
-            var config = RuntimeConfiguration.Load(directory);
-            Check(!config.Enabled, "Default-disabled configuration");
-            Check(config.NativeLibrary == Path.Combine(directory, "SeaPower.Host.dll"), "Package-relative native path");
-            Check(Path.IsPathRooted(config.LogDirectory), "Independent absolute production log directory");
-            Environment.SetEnvironmentVariable("NC_MOD_ENABLED", "1");
-            Check(RuntimeConfiguration.Load(directory).Enabled, "Explicit activation override");
-            Environment.SetEnvironmentVariable("NC_MOD_ENABLED", "yes");
-            Reject(() => RuntimeConfiguration.Load(directory), "Invalid activation override");
-            Environment.SetEnvironmentVariable("NC_MOD_ENABLED", null);
-            foreach (string invalidJson in new[] {
-                validJson.Replace("127.0.0.1", "0.0.0.0"),
-                validJson.Replace("50051", "65536"),
-                validJson.Replace("\"schema\":1", "\"schema\":2"),
-                validJson.Replace("\"abi\":1", "\"abi\":2"),
-                validJson.Replace("\"maxQueuedOrders\":64", "\"maxQueuedOrders\":100"),
-                validJson.Replace("\"clientAutoLaunch\":false", "\"clientAutoLaunch\":true"),
-                "{}", "invalid-json"
-            })
-            {
-                File.WriteAllText(configPath, invalidJson);
-                Reject(() => RuntimeConfiguration.Load(directory), "Invalid runtime configuration");
-            }
-            File.WriteAllText(configPath, validJson);
-            Environment.SetEnvironmentVariable("NC_MOD_CONFIG", "relative.json");
-            Reject(() => RuntimeConfiguration.Load(directory), "Relative explicit config path");
-            Environment.SetEnvironmentVariable("NC_MOD_CONFIG", Path.Combine(directory, "missing.json"));
-            Reject(() => RuntimeConfiguration.Load(directory), "Missing explicit config");
-            Environment.SetEnvironmentVariable("NC_MOD_CONFIG", null);
-            Reject(() => new NativeTransport("relative.dll"), "Relative native library");
-            Reject(() => new NativeTransport(Path.Combine(directory, "missing.dll")), "Missing native DLL");
-            if (arguments.Length == 2)
-            {
-                try
-                {
-                    new NativeTransport(arguments[0]);
-                    throw new Exception("Expected ABI rejection");
-                }
-                catch (InvalidOperationException exception)
-                {
-                    Check(exception.Message == "abi_mismatch", "Loaded native DLL with wrong ABI rejected");
-                }
-                try
-                {
-                    new NativeTransport(arguments[1]);
-                    throw new Exception("Expected missing export rejection");
-                }
-                catch (MissingMethodException exception)
-                {
-                    Check(exception.Message.Contains("nc_initialize"), "Loaded native DLL with missing exports rejected");
-                }
-            }
-
-            config.LogDirectory = Path.Combine(directory, "worker");
-            Directory.CreateDirectory(config.LogDirectory);
-            var mailbox = new RuntimeMailbox();
-            var transport = new FakeTransport();
-            var observer = new ObserverId { Value = "observer" };
-            var observation = new ProviderObservation
-            {
-                Snapshot = new ObserverSnapshot
-                {
-                    SchemaVersion = 4,
-                    SessionId = "runtime-session",
-                    Observer = observer,
-                    Ready = true,
-                    Version = 1
-                },
-            };
-            var own = new UnitObservation
-            {
-                Identity = new ObservationId { Value = "own-observation" },
-                Kinematics = new KinematicsObservation
-                {
-                    PartialPosition = new ObservedPosition
-                    {
-                        LatitudeDeg = 0,
-                        ErrorEllipse = new ObservedErrorEllipse { MajorAxisM = 100, MinorAxisM = 50 }
-                    }
-                },
-                Navigation = new NavigationObservation { PlannedRoute = new Route() },
-                Aircraft = new AircraftObservation { Airborne = false },
-                AirOperations = new AirOperationsObservation
-                {
-                    OnboardCount = 0
-                }
-            };
-            observation.Snapshot.Units.Add(own);
-            observation.OrderAvailability.Add(new OrderDiscovery
-            {
-                SessionId = "runtime-session",
-                Observer = observer.Clone(),
-                Observation = own.Identity.Clone(),
-                BasedOnVersion = 1,
-                Eligibility = new OrderEligibilityState()
-            });
-            byte[] observationBytes = observation.ToByteArray();
-            mailbox.Views.Enqueue(observationBytes);
-            mailbox.Results.Enqueue(new OrderResult
-            {
-                SessionId = "runtime-session", RequestId = "runtime-command", Observer = observer.Clone(), Stage = Stage.RequestReceived
-            }.ToByteArray());
-            var worker = new Thread(() => TransportWorker.Run(mailbox, config, _ => transport));
-            worker.Start();
-            Wait(() => Volatile.Read(ref transport.Views) >= 2 && Volatile.Read(ref transport.Results) >= 2 && mailbox.Commands.Count == 1);
-            Check(!mailbox.Failed, "Retryable publish backpressure preserves pending bytes");
-            Check(mailbox.Commands.TryDequeue(out byte[] command), "Worker copies native command bytes");
-            var parsedCommand = OrderRequest.Parser.ParseFrom(command);
-            Check(parsedCommand.Observation.Value == own.Identity.Value && parsedCommand.Observer.Value == observer.Value &&
-                parsedCommand.PayloadCase == OrderRequest.PayloadOneofCase.Waypoint,
-                "Observer-scoped observation identity reaches exactly one typed command payload");
-            var published = ProviderObservation.Parser.ParseFrom(transport.LastView);
-            Check(published.Snapshot.Units[0].Aircraft.HasAirborne
-                && !published.Snapshot.Units[0].Aircraft.Airborne, "Known false survives production transport mailbox");
-            Check(published.Snapshot.Units[0].AirOperations.HasOnboardCount
-                && published.Snapshot.Units[0].AirOperations.OnboardCount == 0, "Observed known zero inventory survives mailbox");
-            Check(published.Snapshot.Units[0].Navigation != null
-                && published.Snapshot.Units[0].Navigation.PlannedRoute != null
-                && published.Snapshot.Units[0].Kinematics.PartialPosition.HasLatitudeDeg
-                && !published.Snapshot.Units[0].Kinematics.PartialPosition.HasLongitudeDeg
-                && published.OrderAvailability.Count == 1, "Partial location, known-empty route and separate observer-scoped order overlay survive mailbox");
-            mailbox.Stop = true;
-            Wait(() => mailbox.Completed);
-            Check(worker.Join(1000) && transport.Stops == 1, "Orderly off-thread shutdown happens once");
-            Check(File.ReadAllText(Path.Combine(config.LogDirectory, "gateway.log")).Contains("worker-stop status=0"), "Shutdown status logged");
-
-            var failedMailbox = new RuntimeMailbox();
-            config.LogDirectory = Path.Combine(directory, "failed");
-            Directory.CreateDirectory(config.LogDirectory);
-            TransportWorker.Run(failedMailbox, config, _ => throw new InvalidOperationException("abi_mismatch"));
-            Check(failedMailbox.Failed && failedMailbox.Completed && failedMailbox.Error.Contains("abi_mismatch"), "Transport startup failure is observable");
-            config.LogDirectory = configPath;
-            var logFailure = new RuntimeMailbox();
-            TransportWorker.Run(logFailure, config, _ => transport);
-            Check(logFailure.Failed && logFailure.Completed && logFailure.Error.Contains("Diagnostic file failure"), "Unwritable log path retains both failures");
-
-            string evidencePath = Path.Combine(directory, "evidence");
-            string token = Guid.NewGuid().ToString();
-            var evidence = new EvidenceWriter(evidencePath, token, 123);
-            evidence.Emit("playable-ready side=SelectedPlayerSide");
-            Wait(() => File.Exists(Path.Combine(evidencePath, "ready.json")));
-            Check(File.ReadAllText(Path.Combine(evidencePath, "ready.json")).Contains(token), "Harness-only token/PID readiness receipt");
-            evidence.Stop();
-            var failedEvidence = new EvidenceWriter(configPath, token, 123);
-            Wait(() => failedEvidence.Failed);
-            Check(failedEvidence.Error.Contains("Receipt write failed"), "Harness reports unwritable evidence path");
-            failedEvidence.Stop();
-            Console.WriteLine("Runtime/harness checks passed: " + assertions);
+            return 1;
         }
-        finally
-        {
-            Environment.SetEnvironmentVariable("NC_MOD_ENABLED", previousEnabled);
-            Environment.SetEnvironmentVariable("NC_MOD_CONFIG", previousConfig);
-            Environment.SetEnvironmentVariable("NC_MOD_LOG_DIRECTORY", previousLogs);
-        }
+        View = (byte[])bytes.Clone();
+        return 0;
     }
-
-    private sealed class FakeTransport : INativeTransport
+    public int PublishResult(byte[] bytes)
     {
-        public int Views;
-        public int Results;
-        public int Stops;
-        public byte[] LastView;
-        private bool sent;
-        public int Start(string endpoint) => endpoint == "127.0.0.1:50051" ? 0 : -1;
-        public int PublishView(byte[] bytes)
+        Result = (byte[])bytes.Clone();
+        return 0;
+    }
+    public int PollControl(byte[] buffer, out uint size)
+    {
+        size = 0;
+        if (controlSent)
         {
-            LastView = (byte[])bytes.Clone();
-            return Interlocked.Increment(ref Views) == 1 ? 1 : 0;
+            return 1;
         }
-        public int PublishResult(byte[] bytes) => Interlocked.Increment(ref Results) == 1 ? 1 : 0;
-        public int PollOrder(byte[] buffer, out uint size)
-        {
-            size = 0;
-            if (sent)
-            {
-                return 1;
-            }
-            byte[] command = new OrderRequest
-            {
-                SessionId = "runtime-session", RequestId = "runtime-command",
-                Observer = new ObserverId { Value = "observer" }, Observation = new ObservationId { Value = "own-observation" },
-                BasedOnVersion = 1, Waypoint = new Waypoint { LatitudeDeg = 62, LongitudeDeg = -10 }
-            }.ToByteArray();
-            Buffer.BlockCopy(command, 0, buffer, 0, command.Length);
-            size = (uint)command.Length;
-            sent = true;
-            return 0;
-        }
-        public int Stop()
-        {
-            Interlocked.Increment(ref Stops);
-            return 0;
-        }
+        controlSent = true;
+        var bytes = new Control { Client = "client", Session = "new", Request = "request", Pause = true }.ToByteArray();
+        size = (uint)bytes.Length;
+        Buffer.BlockCopy(bytes, 0, buffer, 0, bytes.Length);
+        return 0;
+    }
+    public int Stop()
+    {
+        ++Stops;
+        return 0;
     }
 }

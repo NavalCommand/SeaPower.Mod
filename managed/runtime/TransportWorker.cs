@@ -7,7 +7,7 @@ namespace NavalCommand.SeaPower.Mod;
 internal static class TransportWorker
 {
     private const int MaximumQueuedCommands = 64;
-    private const int MaximumOrderBytes = 65_536;
+    private const int MaximumControlBytes = 65_536;
     private const int WorkerPollMilliseconds = 10;
     internal static void Run(RuntimeMailbox workerMailbox, RuntimeConfiguration configuration, Func<string, INativeTransport> createTransport = null)
     {
@@ -23,14 +23,14 @@ internal static class TransportWorker
             };
             nativeTransport = createTransport == null ? new NativeTransport(nativeLibraryPath) : createTransport(nativeLibraryPath);
             int started = nativeTransport.Start(endpoint);
-            log.WriteLine(DateTime.UtcNow.ToString("o") + " native-start abi=1 status=" + started);
+            log.WriteLine(DateTime.UtcNow.ToString("o") + " native-start abi=2 status=" + started);
             if (started != 0)
             {
                 throw new InvalidOperationException("host_start_failed:" + started);
             }
 
-            File.WriteAllText(Path.Combine(runDirectory, "gateway-ready.json"), "{\"abi\":1,\"endpoint\":\"" + endpoint + "\"}");
-            var buffer = new byte[MaximumOrderBytes];
+            File.WriteAllText(Path.Combine(runDirectory, "gateway-ready.json"), "{\"abi\":2,\"endpoint\":\"" + endpoint + "\"}");
+            var buffer = new byte[MaximumControlBytes];
             byte[] pendingViewBytes = null;
             byte[] pendingResultBytes = null;
             while (!workerMailbox.Stop)
@@ -84,12 +84,12 @@ internal static class TransportWorker
 
                 if (workerMailbox.Commands.Count < MaximumQueuedCommands)
                 {
-                    int statusCode = nativeTransport.PollOrder(buffer, out var size);
+                    int statusCode = nativeTransport.PollControl(buffer, out var size);
                     if (statusCode == 0)
                     {
                         if (size > buffer.Length)
                         {
-                            throw new InvalidOperationException("native_order_size_out_of_bounds");
+                            throw new InvalidOperationException("native_control_size_out_of_bounds");
                         }
                         var bytes = new byte[size];
                         Buffer.BlockCopy(buffer, 0, bytes, 0, (int)size);
@@ -97,7 +97,7 @@ internal static class TransportWorker
                     }
                     else if (statusCode != 1)
                     {
-                        throw new InvalidOperationException("poll_order:" + statusCode);
+                        throw new InvalidOperationException("poll_control:" + statusCode);
                     }
                 }
 

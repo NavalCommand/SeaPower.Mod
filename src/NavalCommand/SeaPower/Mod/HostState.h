@@ -7,6 +7,6 @@ namespace NavalCommand::SeaPower::Mod
 	struct HostState
 	{
 		Bridge BridgeProvider;
-		Gateway::Grpc::Server GatewayServer{BridgeProvider, {}};
+		Gateway::Grpc::Server GatewayServer{BridgeProvider};
 	};
-} // namespace NavalCommand::SeaPower::Mod
+}

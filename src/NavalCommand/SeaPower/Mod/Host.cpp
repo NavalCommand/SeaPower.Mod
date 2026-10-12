@@ -4,15 +4,14 @@
 
 namespace
 {
-	constexpr uint32_t ABI_VERSION = 1;
+	constexpr uint32_t ABI_VERSION = 2;
 	using Host = NavalCommand::SeaPower::Mod::HostState;
 
 	// Explicit worker-owned shutdown only. No static destructor may join gRPC
 	// threads under Windows DLL loader-lock during process termination.
 	Host* host = nullptr;
 	// Lifecycle is serialized by composition worker. No unload while calls run.
-	template <class Callable>
-	int Guarded(Callable&& callable) noexcept
+	template <class Callable> int Guarded(Callable&& callable) noexcept
 	{
 		try
 		{
@@ -23,7 +22,7 @@ namespace
 			return 3;
 		}
 	}
-} // namespace
+}
 extern "C" uint32_t nc_abi_version()
 {
 	return ABI_VERSION;
@@ -31,56 +30,62 @@ extern "C" uint32_t nc_abi_version()
 
 extern "C" int nc_initialize(uint32_t abi, const char* endpoint)
 {
-	return Guarded([&]
-	{
-		if (abi != ABI_VERSION || !endpoint || host)
+	return Guarded(
+		[&]
 		{
-			return 2;
-		}
-		auto candidate = std::make_unique<Host>();
-		if (!candidate->GatewayServer.Start(endpoint))
-		{
-			return 3;
-		}
-		host = candidate.release();
-		return 0;
-	});
+			if (abi != ABI_VERSION || !endpoint || host)
+			{
+				return 2;
+			}
+			auto candidate = std::make_unique<Host>();
+			if (!candidate->GatewayServer.Start(endpoint))
+			{
+				return 3;
+			}
+			host = candidate.release();
+			return 0;
+		});
 }
 
 extern "C" int nc_publish_view(const uint8_t* buffer, uint32_t length)
 {
-	return Guarded([&]
-	{
-		return host ? host->BridgeProvider.PublishView(buffer, length) : 2;
-	});
+	return Guarded(
+		[&]
+		{
+			return host ? host->BridgeProvider.PublishView(buffer, length) : 2;
+		});
 }
 
 extern "C" int nc_publish_result(const uint8_t* buffer, uint32_t length)
 {
-	return Guarded([&]
-	{
-		return host ? host->BridgeProvider.PublishResult(buffer, length) : 2;
-	});
+	return Guarded(
+		[&]
+		{
+			return host ? host->BridgeProvider.PublishResult(buffer, length) : 2;
+		});
 }
 
-extern "C" int nc_poll_order(uint8_t* buffer, uint32_t capacity, uint32_t* length)
+extern "C" int nc_poll_control(uint8_t* buffer, uint32_t capacity, uint32_t* length)
 {
-	return Guarded([&]
-	{
-		return host ? host->BridgeProvider.Poll(buffer, capacity, length) : 2;
-	});
+	return Guarded(
+		[&]
+		{
+			return host ? host->BridgeProvider.Poll(buffer, capacity, length) : 2;
+		});
 }
 
 extern "C" int nc_shutdown()
 {
-	return Guarded([]
-	{
-		if (host)
+	return Guarded(
+		[]
 		{
-			host->GatewayServer.Stop();
-			delete host;
-			host = nullptr;
-		}
-		return 0;
-	});
+			if (host)
+			{
+				host->BridgeProvider.Stop();
+				host->GatewayServer.Stop();
+				delete host;
+				host = nullptr;
+			}
+			return 0;
+		});
 }

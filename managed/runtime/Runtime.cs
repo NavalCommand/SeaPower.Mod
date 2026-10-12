@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Google.Protobuf;
 using HarmonyLib;
 using SeaPower;
 using UnityEngine;
@@ -10,48 +11,114 @@ namespace NavalCommand.SeaPower.Mod;
 
 public sealed class Runtime
 {
-    private const int MaximumQueuedCommands = 64;
-    private const int MaximumRetainedResults = 128;
-    private const int MaximumCommandsPerSample = 8;
-    private const float SampleIntervalWallSeconds = 0.25f;
+    const float SampleIntervalWallSeconds = 0.25f;
+    const int MaximumControlsPerStep = 64;
     readonly RuntimeMailbox mailbox = new();
-    readonly NativeGameFacade gameFacade = new();
-    Action<string> reportError;
-    bool reportedFailure;
+    readonly NativeGameFacade game = new();
     Provider provider;
     Harmony harmony;
-    static Runtime instance;
+    Action<string> reportError;
+    bool stepping;
+    bool releasedAfterFailure;
     float nextSampleWallSeconds;
-    Thread worker;
+    static Runtime instance;
+
     public void Install(RuntimeConfiguration configuration, Action<string> diagnostics)
     {
-        if (instance == this)
+        if (Globals.mainThread != Thread.CurrentThread)
         {
-            return;
+            throw new InvalidOperationException("engine_thread_required");
         }
         if (instance != null && !instance.mailbox.Completed)
         {
             throw new InvalidOperationException("runtime_already_running_or_stopping");
         }
-        if (Globals.mainThread != Thread.CurrentThread)
-        {
-            throw new InvalidOperationException("engine_thread_required");
-        }
         instance = this;
         reportError = diagnostics;
-        harmony = new Harmony("dev.navalcommand.seapower.mod.scheduling");
-        harmony.Patch(typeof(JobPerformer).GetMethod(nameof(JobPerformer.CompleteFixedUpdateJobs)),
-            postfix: new HarmonyMethod(typeof(Runtime).GetMethod(nameof(AfterJobs))));
-        harmony.Patch(AccessTools.Method(typeof(GameMain), "Update"), postfix: new HarmonyMethod(typeof(Runtime).GetMethod(nameof(AfterUpdate))));
+        harmony = new Harmony("dev.navalcommand.seapower.mod.runtime");
+        harmony.Patch(AccessTools.Method(typeof(JobPerformer), nameof(JobPerformer.CompleteFixedUpdateJobs)),
+            postfix: new HarmonyMethod(typeof(Runtime), nameof(AfterJobs)));
+        harmony.Patch(AccessTools.Method(typeof(GameMain), "Update"), postfix: new HarmonyMethod(typeof(Runtime), nameof(AfterUpdate)));
+        harmony.Patch(AccessTools.Method(typeof(GameTime), nameof(GameTime.Pause)), prefix: new HarmonyMethod(typeof(Runtime), nameof(BeforeNativePause)));
+        harmony.Patch(AccessTools.Method(typeof(GameTime), nameof(GameTime.UnPause)), prefix: new HarmonyMethod(typeof(Runtime), nameof(BeforeNativeUnpause)));
+        harmony.Patch(AccessTools.PropertySetter(typeof(GameTime), nameof(GameTime.TimeCompression)),
+            prefix: new HarmonyMethod(typeof(Runtime), nameof(BeforeNativeCompression)));
+        foreach (string method in new[] { "SetTimeCompression", "IncreaseTimeCompression", "DecreaseTimeCompression", "SetMaxPhysicsTimeCompression", "SetMinTimeCompression", "SetMaxTimeCompression", "StopTimeCompression" })
+        {
+            harmony.Patch(AccessTools.Method(typeof(GameTime), method), postfix: new HarmonyMethod(typeof(Runtime), nameof(AfterNativeCompressionSelection)));
+        }
         SceneManager.sceneUnloaded += Unloaded;
         Application.quitting += Stop;
         var workerMailbox = mailbox;
-        worker = new Thread(() => TransportWorker.Run(workerMailbox, configuration))
+        new Thread(() => TransportWorker.Run(workerMailbox, configuration))
         {
-            IsBackground = true,
-            Name = "SeaPower.Mod transport"
-        };
-        worker.Start();
+            IsBackground = true, Name = "SeaPower.Mod transport"
+        }.Start();
+    }
+
+    public static bool BeforeNativePause()
+    {
+        var runtime = instance;
+        if (runtime?.provider == null || runtime.game.ApplyingControl)
+        {
+            return true;
+        }
+        runtime.provider.ObservePlayerPause(true);
+        // Repeated native Pause() invokes EnforceFixedUpdate; retaining a claim
+        // while already effectively paused must not advance a simulation tick.
+        return !runtime.provider.HasExternalPauseOwners || !GameTime.IsPaused();
+    }
+
+    public static bool BeforeNativeUnpause()
+    {
+        var runtime = instance;
+        if (runtime?.provider == null || runtime.game.ApplyingControl)
+        {
+            return true;
+        }
+        runtime.provider.ObservePlayerPause(false);
+        return !runtime.provider.EffectivePause;
+    }
+
+    public static void BeforeNativeCompression(ref float value)
+    {
+        var runtime = instance;
+        if (runtime?.provider == null || runtime.game.ApplyingControl)
+        {
+            return;
+        }
+        if (value > 0.05f)
+        {
+            if (runtime.provider.HasExternalPauseOwners)
+            {
+                runtime.game.ObserveNativeCompression(value);
+            }
+            runtime.provider.ObservePlayerCompression(value);
+            if (runtime.provider.EffectivePause)
+            {
+                value = 0;
+            }
+        }
+        else
+        {
+            runtime.provider.ObservePlayerPause(true);
+        }
+    }
+
+    public static void AfterNativeCompressionSelection()
+    {
+        var runtime = instance;
+        if (runtime?.provider == null || runtime.game.ApplyingControl || !runtime.provider.EffectivePause)
+        {
+            return;
+        }
+        // Native selectors unmute environment audio before assigning compression.
+        // Preserve native mute preference when another owner still holds pause.
+        if (Singleton<OptionsManager>.InstanceExists() && Singleton<OptionsManager>.Instance.MuteSoundInPause
+            && Singleton<EnvironmentAudioManager>.InstanceExists())
+        {
+            Singleton<EnvironmentAudioManager>.Instance.toggleMute(true);
+        }
     }
 
     public static void AfterJobs()
@@ -61,84 +128,77 @@ public sealed class Runtime
 
     public static void AfterUpdate()
     {
-        if (GameTime.IsPaused())
-        {
-            instance?.Step();
-        }
+        instance?.Step();
     }
 
     void Step()
     {
-        if (mailbox.Failed && !reportedFailure)
-        {
-            reportedFailure = true;
-            reportError?.Invoke(mailbox.Error ?? "Provider failed; see runtime log.");
-        }
-        if (mailbox.Failed || mailbox.Stop || Globals.mainThread != Thread.CurrentThread || Time.realtimeSinceStartup < nextSampleWallSeconds
+        if (stepping || mailbox.Stop || Globals.mainThread != Thread.CurrentThread
             || !ObjectCalculationsJobScheduler.HasPreviousJobCompleted || !CollisionAvoidanceJobScheduler.HasPreviousJobCompleted)
         {
             return;
         }
-
-        nextSampleWallSeconds = Time.realtimeSinceStartup + SampleIntervalWallSeconds;
+        stepping = true;
         try
         {
+            if (mailbox.Failed)
+            {
+                if (!releasedAfterFailure)
+                {
+                    releasedAfterFailure = true;
+                    provider?.Invalidate();
+                    provider = null;
+                    harmony?.UnpatchSelf();
+                    reportError?.Invoke(mailbox.Error ?? "Gateway failed.");
+                }
+                return;
+            }
             if (provider == null)
             {
-                if (!gameFacade.Ready || !Singleton<SceneCreator>.InstanceExists())
+                if (!game.Ready)
                 {
                     return;
                 }
-                string playerSide = Singleton<SceneCreator>.Instance.PlayerSideName;
-                if (string.IsNullOrWhiteSpace(playerSide))
-                {
-                    throw new InvalidOperationException("player_side_unavailable");
-                }
-                provider = new Provider(gameFacade, playerSide);
-                mailbox.Events.Enqueue("player-side-bound " + playerSide);
+                provider = new Provider(game);
             }
-            for (int commandIndex = 0; commandIndex < MaximumCommandsPerSample && mailbox.Commands.TryDequeue(out var bytes); ++commandIndex)
+            provider.Synchronize();
+            // Controls, including disconnect releases, drain at each safe callback.
+            // They are never delayed by the wall-clock snapshot polling interval.
+            for (int index = 0; index < MaximumControlsPerStep && mailbox.Commands.TryDequeue(out var bytes); ++index)
             {
-                if (!provider.Enqueue(bytes))
+                var result = provider.Apply(bytes);
+                if (result.Request.Length != 0)
                 {
-                    throw new InvalidOperationException("provider_backpressure");
+                    if (mailbox.Results.Count >= MaximumControlsPerStep)
+                    {
+                        throw new InvalidOperationException("result_resource_exhausted");
+                    }
+                    mailbox.Results.Enqueue(result.ToByteArray());
                 }
             }
-
-            var view = provider.Tick();
-            if (view != null)
+            if (Time.realtimeSinceStartup >= nextSampleWallSeconds)
             {
+                nextSampleWallSeconds = Time.realtimeSinceStartup + SampleIntervalWallSeconds;
+                var publication = provider.Capture();
                 while (mailbox.Views.TryDequeue(out _))
                 {
                 }
-
-                mailbox.Views.Enqueue(view);
-            }
-
-            while (provider.Results.TryDequeue(out var status))
-            {
-                if (mailbox.Results.Count >= MaximumRetainedResults)
-                {
-                    throw new InvalidOperationException("result_backpressure");
-                }
-
-                mailbox.Results.Enqueue(status);
-                var orderResult = NavalCommand.Gateway.Wire.OrderResult.Parser.ParseFrom(status);
-                if (mailbox.Events.Count < MaximumRetainedResults)
-                {
-                    mailbox.Events.Enqueue("dispatch thread=" + Thread.CurrentThread.ManagedThreadId + " request=" + orderResult.RequestId
-                        + " stage=" + orderResult.Stage + " reason=" + orderResult.Reason + " seconds=" + orderResult.SampledAtSeconds);
-                }
+                mailbox.Views.Enqueue(publication);
             }
         }
         catch (Exception exception)
         {
             mailbox.Error = exception.ToString();
             mailbox.Failed = true;
-            if (mailbox.Events.Count < MaximumRetainedResults)
-            {
-                mailbox.Events.Enqueue("provider_failed " + exception);
-            }
+            provider?.Invalidate();
+            provider = null;
+            harmony?.UnpatchSelf();
+            releasedAfterFailure = true;
+            reportError?.Invoke(mailbox.Error);
+        }
+        finally
+        {
+            stepping = false;
         }
     }
 
@@ -148,27 +208,12 @@ public sealed class Runtime
         {
             return;
         }
-
         provider?.Invalidate();
-        while (mailbox.Commands.TryDequeue(out _))
-        {
-        }
-
-        while (mailbox.Results.TryDequeue(out _))
-        {
-        }
-
+        provider = null;
         while (mailbox.Views.TryDequeue(out _))
         {
         }
-
-        if (provider != null && provider.TryRead(out var invalid))
-        {
-            mailbox.Views.Enqueue(invalid);
-        }
-
-        provider = null;
-        mailbox.Events.Enqueue("mission-invalidated thread=" + Thread.CurrentThread.ManagedThreadId);
+        mailbox.Views.Enqueue(new NavalCommand.Gateway.Wire.Publication().ToByteArray());
     }
 
     public void Stop()
@@ -179,15 +224,10 @@ public sealed class Runtime
         }
         Application.quitting -= Stop;
         SceneManager.sceneUnloaded -= Unloaded;
-        harmony?.UnpatchSelf();
         provider?.Invalidate();
-        mailbox.Stop = true;
         provider = null;
-        if (worker == null)
-        {
-            mailbox.Completed = true;
-        }
-        // The stopped singleton guards against overlapping hosts until off-thread shutdown completes.
-        // Never join the worker or unload the native DLL in a Unity callback.
+        harmony?.UnpatchSelf();
+        mailbox.Stop = true;
+        // Worker performs native shutdown; never join it in a Unity callback.
     }
 }

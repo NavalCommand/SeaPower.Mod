@@ -6,6 +6,6 @@ internal interface INativeTransport
     int Start(string endpoint);
     int PublishView(byte[] bytes);
     int PublishResult(byte[] bytes);
-    int PollOrder(byte[] buffer, out uint size);
+    int PollControl(byte[] buffer, out uint size);
     int Stop();
 }

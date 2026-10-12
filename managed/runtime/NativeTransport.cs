@@ -6,7 +6,7 @@ namespace NavalCommand.SeaPower.Mod;
 // DLL is deliberately not FreeLibrary'd; RPC code may have process-lifetime state.
 public sealed class NativeTransport : INativeTransport
 {
-    private const uint AbiVersion = 1;
+    private const uint AbiVersion = 2;
     // Restrict dependency probing to the DLL directory and standard safe directories.
     private const uint LoadLibrarySearchDllLoadDirectory = 0x100;
     private const uint LoadLibrarySearchDefaultDirectories = 0x1000;
@@ -28,7 +28,7 @@ public sealed class NativeTransport : INativeTransport
     readonly Initialize initializeHost;
     readonly Publish publishView;
     readonly Publish publishResult;
-    readonly Poll pollOrder;
+    readonly Poll pollControl;
     readonly Shutdown shutdownHost;
     private bool started;
     private bool stopped;
@@ -64,7 +64,7 @@ public sealed class NativeTransport : INativeTransport
         initializeHost = Bind<Initialize>("nc_initialize");
         publishView = Bind<Publish>("nc_publish_view");
         publishResult = Bind<Publish>("nc_publish_result");
-        pollOrder = Bind<Poll>("nc_poll_order");
+        pollControl = Bind<Poll>("nc_poll_control");
         shutdownHost = Bind<Shutdown>("nc_shutdown");
     }
 
@@ -84,7 +84,7 @@ public sealed class NativeTransport : INativeTransport
     }
     public int PublishView(byte[] bytes) => publishView(bytes, (uint)bytes.Length);
     public int PublishResult(byte[] bytes) => publishResult(bytes, (uint)bytes.Length);
-    public int PollOrder(byte[] buffer, out uint size) => pollOrder(buffer, (uint)buffer.Length, out size);
+    public int PollControl(byte[] buffer, out uint size) => pollControl(buffer, (uint)buffer.Length, out size);
     public int Stop()
     {
         if (stopped || !started)

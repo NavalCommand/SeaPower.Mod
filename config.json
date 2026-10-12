@@ -1,11 +1,9 @@
 {
- "schema": 1,
- "abi": 1,
+ "schema": 2,
+ "abi": 2,
  "endpoint": "127.0.0.1:50051",
  "enabledByDefault": false,
  "clientAutoLaunch": false,
- "maxMessageBytes": 1048576,
- "maxQueuedOrders": 64,
- "maxRetainedRequests": 128
+ "maxMessageBytes": 16777216,
+ "maxQueuedControls": 64
 }
-

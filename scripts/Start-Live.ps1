@@ -5,15 +5,13 @@ param(
     [ValidateSet('Production', 'Harness', 'Combined')][string]$Mode = 'Combined',
     [string]$Package = (Join-Path (Split-Path $PSScriptRoot) 'o/package/0.1.0'),
     [string]$HarnessPackage = (Join-Path (Split-Path $PSScriptRoot) 'o/harness/0.1.0'),
-    [string]$Cli,
+    [string]$ClientExecutable,
     [string[]]$ClientArguments = @(),
     [string]$FixtureAssembly,
     [string]$Scenario = (Join-Path (Split-Path $PSScriptRoot) 'managed/harness/scenarios/MinimalCombat.ini'),
     [string]$Side = 'Taskforce1',
     [string]$RuntimeLogDirectory,
     [ValidateRange(1, 300)][int]$TimeoutSeconds = 180,
-    [switch]$Smoke,
-    [switch]$Blocked,
     [switch]$ReloadTest,
     [switch]$RuntimeDisabled,
     [switch]$NormalExit,
@@ -37,8 +35,8 @@ if ($FixtureAssembly) {
         throw 'A fixture must be an explicitly selected managed plugin DLL'
     }
 }
-if (($Smoke -or $Blocked -or $ReloadTest -or $ClientArguments.Count) -and (!$useRuntime -or $RuntimeDisabled -or !$Cli)) {
-    throw 'Command/reload checks require the explicitly enabled runtime and external CLI'
+if ($ClientArguments.Count -and (!$useRuntime -or $RuntimeDisabled -or !$ClientExecutable)) {
+    throw 'Client arguments require the enabled runtime and an explicit client executable'
 }
 if ($ReloadTest -and !$useHarness) {
     throw 'Automated reload requires the separately enabled development harness'
@@ -155,7 +153,7 @@ try {
         }
         if ($useRuntime -and (Test-Path "$GameRoot/BepInEx/LogOutput.log") -and
             (Get-Item "$GameRoot/BepInEx/LogOutput.log").LastWriteTimeUtc -ge $startedUtc -and
-            (Select-String "$GameRoot/BepInEx/LogOutput.log" -Pattern 'Runtime bootstrap failed:' -Quiet)) {
+            (Select-String "$GameRoot/BepInEx/LogOutput.log" -Pattern 'Runtime bootstrap failed:|Runtime failed:|Production bootstrap failed:' -Quiet)) {
             throw 'Production bootstrap failed; see archived loader.log'
         }
         foreach ($errorFile in @('evidence-error.json', 'gateway-error.txt')) {
@@ -185,36 +183,23 @@ try {
     if (!$ready) {
         throw "Readiness timeout after $TimeoutSeconds seconds"
     }
-    if ($Cli -and $useRuntime -and !$RuntimeDisabled) {
+    if ($ClientExecutable -and $useRuntime -and !$RuntimeDisabled) {
         $config = Get-Content "$runtimeStage/config.json" -Raw | ConvertFrom-Json
-        if ($Mode -eq 'Production') {
-            # Production never selects a mission. Wait for a player-selected playable view.
-            $viewAvailable = $false
-            while ([DateTime]::UtcNow -lt $deadline -and !$gameProcess.HasExited) {
-                & $Cli --endpoint $config.endpoint *> "$runDirectory/readiness-view.log"
-                if (!$LASTEXITCODE) {
-                    $viewAvailable = $true
-                    break
-                }
-                Start-Sleep -Milliseconds 500
-            }
-            if (!$viewAvailable) {
-                throw 'No player-selected playable view before timeout'
-            }
-        }
-        $cliArguments = @('--endpoint', $config.endpoint)
-        $cliArguments += $ClientArguments
-        if ($Smoke) { $cliArguments += '--smoke' }
-        if ($Blocked) { $cliArguments += '--blocked' }
-        if ($ReloadTest) { $cliArguments += '--reload' }
-        & $Cli @cliArguments *> "$runDirectory/cli.log"
-        $cliExitCode = $LASTEXITCODE
-        if ($cliExitCode) {
-            throw "CLI failed: $cliExitCode"
+        # CommandCenter renders loading/stale states itself; it does not act as a readiness CLI.
+        $clientOptions = @('--endpoint', $config.endpoint, '--duration-ms', '30000') + $ClientArguments
+        & $ClientExecutable @clientOptions *> "$runDirectory/client.log"
+        $clientExitCode = $LASTEXITCODE
+        if ($clientExitCode) {
+            throw "Client failed: $clientExitCode"
         }
     }
-    [ordered]@{ ready = $ready; mode = $Mode; cliExitCode = $cliExitCode; clientArguments = $ClientArguments; optedIntoMutation = [bool]($Smoke -or $Blocked -or $ClientArguments.Count); finishedUtc = [DateTime]::UtcNow.ToString('o') } |
-        ConvertTo-Json | Set-Content "$runDirectory/result.json"
+    [ordered]@{
+        ready = $ready
+        mode = $Mode
+        clientExitCode = $clientExitCode
+        clientArguments = $ClientArguments
+        finishedUtc = [DateTime]::UtcNow.ToString('o')
+    } | ConvertTo-Json | Set-Content "$runDirectory/result.json"
     if ($NormalExit) {
         # WM_CLOSE asks Unity to close normally; forced fallback is recorded separately.
         $gameProcess.Refresh()

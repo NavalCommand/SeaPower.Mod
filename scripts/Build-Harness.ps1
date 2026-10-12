@@ -4,7 +4,7 @@ param(
     [string]$CMake = 'cmake'
 )
 $ErrorActionPreference = 'Stop'
-& $CMake --build "$PSScriptRoot/../o/$Preset" --config $Configuration --target package-harness
+& $CMake --build "$PSScriptRoot/../o/$Preset" --config $Configuration --target NavalCommand.SeaPower.Mod.PackageHarness
 if ($LASTEXITCODE) {
-    throw 'package-harness failed; configure the selected preset before building.'
+    throw 'Harness packaging failed; configure the selected preset before building.'
 }
