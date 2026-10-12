@@ -1,6 +1,6 @@
 #pragma once
 #include <NavalCommand/Gateway/Api/Codec.h>
-#include <NavalCommand/Orders/Api/Request.h>
+#include <NavalCommand/Orders/Api/ExecutionRequest.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -35,7 +35,7 @@ public:
 		return m_Observation;
 	}
 
-	Orders::Api::Result Submit(const Orders::Api::Request &request) override {
+	Orders::Api::Result Submit(const Orders::Api::ExecutionRequest &request) override {
 		std::lock_guard lock(m_Mutex);
 		using namespace Orders::Api;
 		const auto &snapshot = m_Observation.Snapshot;
