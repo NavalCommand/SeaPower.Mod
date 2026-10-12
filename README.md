@@ -16,4 +16,10 @@ Internal dependencies use shared Build.CMake and optional ignored Build.Local.cm
 
 Package targets: NavalCommand.SeaPower.Mod.PackageRuntime and NavalCommand.SeaPower.Mod.PackageHarness. Configuration is disabled by default. Start-Live.ps1 requires explicit deployment approval and always restores its loader configuration and owned plugin directories.
 
+For interactive mission testing, run `pwsh -File ./scripts/Start-TestMission.ps1`. Choose a numbered mission from `managed/harness/scenarios`; the script reads its player side, creates a fresh log directory under `o/live/`, and loads both staged mods. It discovers the game directory from the local managed build context, or accepts `-GameRoot`. Invoking this launcher authorizes temporary deployment and loader activation. Keep its PowerShell window open and quit Sea Power normally when finished; cleanup then restores the loader and removes temporary plugins. CommandCenter can be launched separately at any time during the session. Packages must already be built.
+
+Use `-ScenarioName NearContact` to skip the menu, or add `-WhatIf` to preview without deploying or starting the game. `Start-Live.ps1 -WaitForGameExit` provides the same interactive session lifetime for direct invocations; its default bounded verification behavior is unchanged.
+
+Running `./scripts/Start-TestMission.ps1` in Windows PowerShell 5.1 automatically hands off to PowerShell 7, preserving supplied options. It looks for `pwsh` on PATH, a standard installation, or the existing Codex bundled runtime. If none is available it reports the requirement before deployment.
+
 The separate test target `NavalCommand.SeaPower.Mod.LiveFixture` builds a native player-control regression plugin. It is never included in either package. Explicit `Start-Live.ps1 -FixtureAssembly` activation is described in the integration report. Real-game testing identified and corrected paused job-completion starvation; the recorded native ownership, disconnect and reload checks passed.

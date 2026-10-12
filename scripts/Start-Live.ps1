@@ -14,6 +14,7 @@ param(
     [ValidateRange(1, 300)][int]$TimeoutSeconds = 180,
     [switch]$ReloadTest,
     [switch]$RuntimeDisabled,
+    [switch]$WaitForGameExit,
     [switch]$NormalExit,
     [switch]$ApproveLoaderChanges
 )
@@ -193,6 +194,17 @@ try {
             throw "Client failed: $clientExitCode"
         }
     }
+    if ($WaitForGameExit) {
+        Write-Host "Mission ready. Runtime and harness remain loaded until you quit Sea Power."
+        Write-Host "Keep this PowerShell window open for automatic deployment cleanup. Logs: $runDirectory"
+        while (!$gameProcess.WaitForExit(1000)) {
+            # Keep the launcher's finally block alive throughout the interactive session.
+        }
+        $cleanupMode = 'game-exited'
+        if ($gameProcess.ExitCode) {
+            throw "Owned game exited with code $($gameProcess.ExitCode)"
+        }
+    }
     [ordered]@{
         ready = $ready
         mode = $Mode
@@ -200,7 +212,7 @@ try {
         clientArguments = $ClientArguments
         finishedUtc = [DateTime]::UtcNow.ToString('o')
     } | ConvertTo-Json | Set-Content "$runDirectory/result.json"
-    if ($NormalExit) {
+    if ($NormalExit -and !$gameProcess.HasExited) {
         # WM_CLOSE asks Unity to close normally; forced fallback is recorded separately.
         $gameProcess.Refresh()
         if ($gameProcess.MainWindowHandle -eq [IntPtr]::Zero -or !$gameProcess.CloseMainWindow() -or !$gameProcess.WaitForExit(15000)) {
