@@ -12,6 +12,7 @@ add_dependencies(NavalCommand.SeaPower.Mod.Managed NavalCommand.SeaPower.Mod)
 NavalCommandAddManagedProject(NavalCommand.SeaPower.Mod.Harness harness/SeaPower.Harness.csproj)
 if (PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
     NavalCommandAddManagedProject(NavalCommand.SeaPower.Mod.ManagedTest "../test/managed/RuntimeTests.csproj")
+    NavalCommandAddManagedProject(NavalCommand.SeaPower.Mod.LiveFixture "../test/managed/live/SeaPower.LiveFixture.csproj")
 endif ()
 
 find_program(POWERSHELL_EXECUTABLE pwsh REQUIRED)

@@ -15,3 +15,5 @@ ctest --test-dir o/windows-msvc-release --output-on-failure
 Internal dependencies use shared Build.CMake and optional ignored Build.Local.cmake registrations. Windows uses x64-windows-static and static MSVC CRT. Generated artifacts stay under o/. Managed builds additionally require the configured game/reference context; see Docs/MANAGED_BUILD.md. New client repositories are not yet populated remotely, so use local source registrations for the current checkout.
 
 Package targets: NavalCommand.SeaPower.Mod.PackageRuntime and NavalCommand.SeaPower.Mod.PackageHarness. Configuration is disabled by default. Start-Live.ps1 requires explicit deployment approval and always restores its loader configuration and owned plugin directories.
+
+The separate test target `NavalCommand.SeaPower.Mod.LiveFixture` builds a native player-control regression plugin. It is never included in either package. Explicit `Start-Live.ps1 -FixtureAssembly` activation is described in the integration report. Real-game testing identified and corrected paused job-completion starvation; the recorded native ownership, disconnect and reload checks passed.

@@ -128,6 +128,16 @@ public sealed class Runtime
 
     public static void AfterUpdate()
     {
+        // A pause applied in the completion postfix can be followed by the
+        // remainder of the native fixed update scheduling its final jobs.
+        // No further fixed update runs at timeScale zero. Complete those jobs
+        // on the engine thread without enforcing another simulation tick.
+        if (instance != null && !instance.stepping && !instance.mailbox.Stop
+            && Globals.mainThread == Thread.CurrentThread && GameTime.IsPaused()
+            && (!ObjectCalculationsJobScheduler.HasPreviousJobCompleted || !CollisionAvoidanceJobScheduler.HasPreviousJobCompleted))
+        {
+            JobPerformer.CompleteFixedUpdateJobs();
+        }
         instance?.Step();
     }
 
