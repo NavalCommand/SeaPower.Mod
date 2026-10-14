@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Google.Protobuf;
 using NavalCommand.Gateway.Wire;
+using NavalCommand.SeaPower.Client;
 using NavalCommand.SeaPower.Mod;
 
 static void Check(bool passed, string description)
@@ -20,6 +22,38 @@ File.WriteAllText(Path.Combine(directory, "config.json"), valid);
 var configuration = RuntimeConfiguration.Load(directory);
 configuration.LogDirectory = directory;
 Check(configuration.Abi == 2 && !configuration.Enabled, "explicit version and disabled deployment default");
+Check(configuration.ClassificationMode == "safe" && configuration.PlatformRoleMappingsPath == Path.Combine(directory, "platform-roles.ini"), "safe classification and mapping path defaults");
+File.WriteAllText(Path.Combine(directory, "platform-roles.ini"), "[PlatformRoles]\nvessels/example=SurfaceWarfare,AntiSubmarineWarfare\nvessels/unarmed=\n");
+var mappings = new IniPlatformRoleMappingProvider(Path.Combine(directory, "platform-roles.ini"));
+Check(mappings.TryGetRoles("vessels/example", out var mappedRoles)
+    && mappedRoles.Count == 2 && mappedRoles.Contains(PlatformRole.SurfaceWarfare), "INI role map resolves typed role overrides");
+Check(mappings.TryGetRoles("vessels/unarmed", out var emptyRoles) && emptyRoles.Count == 0, "empty INI mapping removes all platform roles");
+Check(!mappings.TryGetRoles("vessels/unmapped", out _), "unmapped type uses native role defaults");
+File.WriteAllText(Path.Combine(directory, "platform-roles.ini"), "[PlatformRoles]\nvessels/example=NotARole\n");
+bool invalidRoleRejected = false;
+try
+{
+    _ = new IniPlatformRoleMappingProvider(Path.Combine(directory, "platform-roles.ini"));
+}
+catch (InvalidDataException)
+{
+    invalidRoleRejected = true;
+}
+Check(invalidRoleRejected, "invalid INI role is rejected");
+File.WriteAllText(Path.Combine(directory, "platform-roles.ini"), "[PlatformRoles]\nvessels/example=0\n");
+invalidRoleRejected = false;
+try
+{
+    _ = new IniPlatformRoleMappingProvider(Path.Combine(directory, "platform-roles.ini"));
+}
+catch (InvalidDataException)
+{
+    invalidRoleRejected = true;
+}
+Check(invalidRoleRejected, "numeric INI roles are rejected");
+File.WriteAllText(Path.Combine(directory, "platform-roles.ini"), "[PlatformRoles]\nvessels/example=SurfaceWarfare\n");
+File.WriteAllText(Path.Combine(directory, "config.json"), valid.Replace("\"enabledByDefault\":false", "\"enabledByDefault\":false,\"classificationMode\":\"aggressive\",\"platformRoleMappings\":\"platform-roles.ini\""));
+Check(RuntimeConfiguration.Load(directory).ClassificationMode == "aggressive", "aggressive classification mode is configurable");
 foreach (string invalid in new[] { valid.Replace("\"abi\":2", "\"abi\":1"), valid.Replace("16777216", "1048576"), valid.Replace("127.0.0.1", "0.0.0.0") })
 {
     File.WriteAllText(Path.Combine(directory, "config.json"), invalid);

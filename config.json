@@ -5,5 +5,7 @@
  "enabledByDefault": false,
  "clientAutoLaunch": false,
  "maxMessageBytes": 16777216,
- "maxQueuedControls": 64
+ "maxQueuedControls": 64,
+ "classificationMode": "safe",
+ "platformRoleMappings": "platform-roles.ini"
 }

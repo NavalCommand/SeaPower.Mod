@@ -12,6 +12,8 @@
     <Compile Include="../../managed/runtime/TransportWorker.cs" />
     <Compile Include="../../managed/runtime/INativeTransport.cs" />
     <Compile Include="../../managed/runtime/NativeTransport.cs" />
+    <Compile Include="../../managed/runtime/IniPlatformRoleMappingProvider.cs" />
+    <Compile Include="../../../SeaPower.Client/managed/src/NavalCommand/SeaPower/Client/ClassificationMapping.cs" Link="ClassificationMapping.cs" />
     <ProjectReference Include="$(GatewayApiSource)/managed/Gateway.Api.csproj" />
   </ItemGroup>
 </Project>

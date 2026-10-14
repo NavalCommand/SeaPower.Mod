@@ -14,7 +14,7 @@ public sealed class Runtime
     const float SampleIntervalWallSeconds = 0.25f;
     const int MaximumControlsPerStep = 64;
     readonly RuntimeMailbox mailbox = new();
-    readonly NativeGameFacade game = new();
+    readonly NativeGameFacade game;
     Provider provider;
     Harmony harmony;
     Action<string> reportError;
@@ -22,6 +22,11 @@ public sealed class Runtime
     bool releasedAfterFailure;
     float nextSampleWallSeconds;
     static Runtime instance;
+
+    public Runtime(NativeGameFacade gameFacade)
+    {
+        game = gameFacade ?? throw new ArgumentNullException(nameof(gameFacade));
+    }
 
     public void Install(RuntimeConfiguration configuration, Action<string> diagnostics)
     {
