@@ -140,7 +140,7 @@ $output = [Collections.Generic.List[string]]::new()
 $output.Add('; Sea Power 8.3 default platform-role overrides.')
 $output.Add('; Keys use the active Unit.TypeId form: <content-folder>/<INI-name>.')
 $output.Add('; Values are NavalCommand PlatformRole names; an empty value clears native roles.')
-$output.Add('; Entries were built from native AI.Role definitions and cross-checked against language_en encyclopedia Type labels.')
+$output.Add('; Entries were built from native AI.Role definitions and annotated with language_en encyclopedia Type labels when available.')
 $output.Add('; Edit or extend this file to override one type. Unlisted mod types use the built-in native-role mapping.')
 $output.Add('[PlatformRoles]')
 foreach ($entry in $mappings.GetEnumerator()) {
