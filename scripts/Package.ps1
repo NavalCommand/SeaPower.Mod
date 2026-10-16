@@ -40,6 +40,9 @@ if ($Kind -eq 'Runtime') {
     }
     Copy-Item -LiteralPath $NativeHost -Destination $stage
     Copy-Item -LiteralPath "$repository/config.json" -Destination $stage
+    Copy-Item -LiteralPath "$repository/platform-roles.ini" -Destination $stage
+    Copy-Item -LiteralPath "$repository/alternative-display-names.en.ini" -Destination $stage
+    Copy-Item -LiteralPath "$repository/alternative-display-names.ru.ini" -Destination $stage
     $licenses = Join-Path $stage 'licenses'
     New-Item -ItemType Directory -Path $licenses | Out-Null
     Get-ChildItem "$VcpkgInstalled/$Triplet/share/*/copyright" | ForEach-Object {
@@ -53,7 +56,7 @@ if ($Kind -eq 'Runtime') {
     elseif (!(Test-Path -LiteralPath "$licenses/protobuf.txt" -PathType Leaf)) {
         throw 'Protobuf redistribution license is unavailable'
     }
-    $allowedFiles = @('SeaPower.Mod.dll', 'SeaPower.Client.dll', 'Gateway.Api.dll', 'Google.Protobuf.dll', 'SeaPower.Host.dll', 'config.json')
+    $allowedFiles = @('SeaPower.Mod.dll', 'SeaPower.Client.dll', 'Gateway.Api.dll', 'Google.Protobuf.dll', 'SeaPower.Host.dll', 'config.json', 'platform-roles.ini', 'alternative-display-names.en.ini', 'alternative-display-names.ru.ini')
     foreach ($file in Get-ChildItem -LiteralPath $stage -File -Recurse) {
         $relativePath = [IO.Path]::GetRelativePath($stage, $file.FullName).Replace('\', '/')
         if ($relativePath -notin $allowedFiles -and $relativePath -notmatch '^licenses/[^/]+\.txt$') {

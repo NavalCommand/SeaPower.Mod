@@ -18,6 +18,11 @@ public sealed class RuntimeConfiguration
     [DataMember(Name = "clientAutoLaunch", IsRequired = true)] public bool ClientAutoLaunch { get; set; }
     [DataMember(Name = "nativeLibrary")] public string NativeLibrary { get; set; }
     [DataMember(Name = "logDirectory")] public string LogDirectory { get; set; }
+    [DataMember(Name = "classificationMode")] public string ClassificationMode { get; set; }
+    [DataMember(Name = "platformRoleMappings")] public string PlatformRoleMappings { get; set; }
+    [DataMember(Name = "alternativeDisplayNames")] public string AlternativeDisplayNames { get; set; }
+    public string PlatformRoleMappingsPath { get; private set; }
+    public string AlternativeDisplayNamesPath { get; private set; }
 
     public static RuntimeConfiguration Load(string moduleDirectory)
     {
@@ -31,6 +36,11 @@ public sealed class RuntimeConfiguration
         if (configuration == null || configuration.Schema != 2 || configuration.Abi != 2)
         {
             throw new InvalidDataException("Unsupported configuration schema or ABI.");
+        }
+        configuration.ClassificationMode = (configuration.ClassificationMode ?? "safe").Trim().ToLowerInvariant();
+        if (configuration.ClassificationMode != "safe" && configuration.ClassificationMode != "aggressive")
+        {
+            throw new ArgumentException("classificationMode must be safe or aggressive.");
         }
         string enabledOverride = Environment.GetEnvironmentVariable("NC_MOD_ENABLED");
         if (enabledOverride != null)
@@ -54,6 +64,8 @@ public sealed class RuntimeConfiguration
         configuration.NativeLibrary = ResolvePath(moduleDirectory, configuration.NativeLibrary ?? "SeaPower.Host.dll");
         configuration.LogDirectory = ResolvePath(moduleDirectory, Environment.GetEnvironmentVariable("NC_MOD_LOG_DIRECTORY")
             ?? configuration.LogDirectory ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NavalCommand", "SeaPower.Mod"));
+        configuration.PlatformRoleMappingsPath = ResolvePath(moduleDirectory, configuration.PlatformRoleMappings ?? "platform-roles.ini");
+        configuration.AlternativeDisplayNamesPath = ResolvePath(moduleDirectory, configuration.AlternativeDisplayNames ?? "alternative-display-names.ru.ini");
         return configuration;
     }
 

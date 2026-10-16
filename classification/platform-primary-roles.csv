@@ -1,0 +1,1003 @@
+TypeId,PrimaryRole,Disposition,SourceIds,Notes
+aircraft/civ_707,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/civ_c340,,Multipurpose,GAME,No single intrinsic mission selected; retain all capabilities.
+aircraft/civ_dc-10,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/civ_h700,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/civ_il-18,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/civ_il-62,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/civ_tu-154,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/civ_v35,,Multipurpose,GAME,No single intrinsic mission selected; retain all capabilities.
+aircraft/fr_alouette_ii,,Multipurpose,GAME,No single intrinsic mission selected; retain all capabilities.
+aircraft/fr_as-350,,Multipurpose,GAME,No single intrinsic mission selected; retain all capabilities.
+aircraft/fr_f1a,,Multipurpose,GAME;AIR-TYPES;MIRAGE,Attack or multirole variant; generic family designation is insufficient to impose fighter priority.
+aircraft/fr_f1c,AirSuperiority,Primary,GAME;AIR-TYPES;MIRAGE,Interceptor variant; fighter mission retained.
+aircraft/fr_f1e,,Multipurpose,GAME;AIR-TYPES;MIRAGE,Attack or multirole variant; generic family designation is insufficient to impose fighter priority.
+aircraft/fr_h700,,Unspecified,GAME,Fictional/proposed or ambiguous game platform; no operational historical mission asserted.
+aircraft/fr_mirage_iii,,Multipurpose,GAME;AIR-TYPES;MIRAGE,Attack or multirole variant; generic family designation is insufficient to impose fighter priority.
+aircraft/fr_sa-321,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/iaf_f-4e_kurnass,,Multipurpose,GAME;AIR-TYPES;F4;F18,Fighter and attack missions share the platform; no priority from loadout.
+aircraft/iaf_md500,,Multipurpose,GAME,No single intrinsic mission selected; retain all capabilities.
+aircraft/iqaf_md500,,Multipurpose,GAME,No single intrinsic mission selected; retain all capabilities.
+aircraft/iriaf_ah-1j,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/iriaf_f-14a,AirSuperiority,Primary,GAME;AIR-TYPES;F14,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/iriaf_f-4d,,Multipurpose,GAME;AIR-TYPES;F4;F18,Fighter and attack missions share the platform; no priority from loadout.
+aircraft/iriaf_f-4e,,Multipurpose,GAME;AIR-TYPES;F4;F18,Fighter and attack missions share the platform; no priority from loadout.
+aircraft/irina_sh-3d,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;H3,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/jasdf_f-1,Strike,Primary,GAME;AIR-TYPES;ATTACK,Attack specialization; do not infer fighter priority from the general encyclopedia heading.
+aircraft/jasdf_f-4ej,,Multipurpose,GAME;AIR-TYPES;F4;F18,Fighter and attack missions share the platform; no priority from loadout.
+aircraft/jasdf_t-2,,Unrepresented,GAME,Advanced trainer; training is outside the current generic role vocabulary.
+aircraft/jmsdf_hss-2,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;H3,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/jmsdf_ps-1,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;PATROL,Antisubmarine patrol variant; distinguish from general patrol or rescue variants.
+aircraft/jmsdf_us-1,,Unrepresented,GAME;AIR-TYPES;PATROL,Dedicated rescue variant; domain has no search-and-rescue role. Do not label as maritime combat patrol.
+aircraft/pla_f-5,AirSuperiority,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/pla_h-6a,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/pla_h-6d,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/pla_j-5,AirSuperiority,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/pla_j-7c,AirSuperiority,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/pla_q-5,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/pla_q-5a,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/pla_z-8,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/plan_sh-5,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;PATROL,Antisubmarine patrol variant; distinguish from general patrol or rescue variants.
+aircraft/raaf_f-111c,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/raaf_n22,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/raaf_searchmaster_b,MaritimePatrol,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/raaf_searchmaster_l,MaritimePatrol,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/ran_a-4g,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_b-52d,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_b-52g,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_c-141b,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_e-3a,AirborneEarlyWarning,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_f-15a,AirSuperiority,Primary,GAME;AIR-TYPES;F15,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_f-15c,AirSuperiority,Primary,GAME;AIR-TYPES;F15,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_f-4d,,Multipurpose,GAME;AIR-TYPES;F4;F18,Fighter and attack missions share the platform; no priority from loadout.
+aircraft/usaf_f-4e,,Multipurpose,GAME;AIR-TYPES;F4;F18,Fighter and attack missions share the platform; no priority from loadout.
+aircraft/usaf_f-5a,AirSuperiority,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_f-5e,AirSuperiority,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_hh-3,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+aircraft/usaf_kc-10,AerialRefuelling,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usaf_vc-137c,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usmc_ah-1t,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usmc_av-8a,Strike,Primary,GAME;AIR-TYPES;ATTACK,Attack specialization; do not infer fighter priority from the general encyclopedia heading.
+aircraft/usn_a-3b,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_a-6e,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_a-7e,Strike,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_ch-46,Transport,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_e-2c,AirborneEarlyWarning,Primary,GAME;AIR-TYPES;E2,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_ea-6b,ElectronicWarfare,Primary,GAME;AIR-TYPES;EA6,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_eka-3b,,Multipurpose,GAME;AIR-TYPES,Combined electronic-warfare and tanker variant; no priority between its specializations.
+aircraft/usn_f-14a,AirSuperiority,Primary,GAME;AIR-TYPES;F14,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_f-4j,,Multipurpose,GAME;AIR-TYPES;F4;F18,Fighter and attack missions share the platform; no priority from loadout.
+aircraft/usn_fa-18a,,Multipurpose,GAME;AIR-TYPES;F4;F18,Fighter and attack missions share the platform; no priority from loadout.
+aircraft/usn_ka-3b,AerialRefuelling,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_p-2h,MaritimePatrol,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_p-3c,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;P3,Antisubmarine patrol variant; distinguish from general patrol or rescue variants.
+aircraft/usn_qh-50c,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;DASH,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_qh-50d,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;DASH,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_ra-3b,Reconnaissance,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_ra-5c,Reconnaissance,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_s-3a,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;S3,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_sh-2f,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_sh-3h,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;H3,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/usn_v-19a,,Unspecified,GAME,Fictional/proposed or ambiguous game platform; no operational historical mission asserted.
+aircraft/wp_il-38,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;SOVIET,Antisubmarine patrol variant; distinguish from general patrol or rescue variants.
+aircraft/wp_ka-25,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_ka-25ts,Reconnaissance,Primary,GAME;SOVIET,Target acquisition/reconnaissance variant rather than ASW helicopter.
+aircraft/wp_ka-27,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_ka-29,Strike,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_lim-6,,Multipurpose,GAME;SOVIET,No single intrinsic mission selected; retain all capabilities.
+aircraft/wp_mi-14,AntiSubmarineWarfare,Primary,GAME;SOVIET,Antisubmarine patrol variant; distinguish from general patrol or rescue variants.
+aircraft/wp_mig-17,AirSuperiority,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_mig-21,AirSuperiority,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_mig-23a,AirSuperiority,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_mig-23mld,AirSuperiority,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_mig-23ms,AirSuperiority,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_mig-25bm,Strike,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_mig-25p,AirSuperiority,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_mig-25pd,AirSuperiority,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_mig-25pu,,Unrepresented,GAME;SOVIET,Trainer variant; domain has no training role.
+aircraft/wp_mig-25rb,Reconnaissance,Primary,GAME;AIR-TYPES;SOVIET;FOXBAT,Reconnaissance/bomber variant; reconnaissance is the defining specialization.
+aircraft/wp_mig-27,Strike,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_mig-28,,Unspecified,GAME,Fictional/proposed or ambiguous game platform; no operational historical mission asserted.
+aircraft/wp_p-42,,Unspecified,GAME,Fictional/proposed or ambiguous game platform; no operational historical mission asserted.
+aircraft/wp_p-42_rldn,,Unspecified,GAME,Fictional/proposed or ambiguous game platform; no operational historical mission asserted.
+aircraft/wp_su-15,AirSuperiority,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_su-24a,Strike,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_su-24m,Strike,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_taifun,,Unspecified,GAME,Fictional/proposed or ambiguous game platform; no operational historical mission asserted.
+aircraft/wp_taifun_ew,,Unspecified,GAME,Fictional/proposed or ambiguous game platform; no operational historical mission asserted.
+aircraft/wp_tu-142m,AntiSubmarineWarfare,Primary,GAME;AIR-TYPES;SOVIET,Antisubmarine patrol variant; distinguish from general patrol or rescue variants.
+aircraft/wp_tu-16,Strike,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_tu-16k,Strike,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_tu-16p,ElectronicWarfare,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_tu-22m2,Strike,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_tu-95rt,Reconnaissance,Primary,GAME;AIR-TYPES;SOVIET,Specialized platform type; secondary capabilities do not erase its principal design mission.
+aircraft/wp_yak-38,Strike,Primary,GAME;SOVIET;ATTACK,Attack specialization; do not infer fighter priority from the general encyclopedia heading.
+ammunition/all_air_chaff_heavy,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/all_air_chaff_standard,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/all_assault_raft,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/all_pilot,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/all_ship_chaff,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/all_ship_chaff_early,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/all_ship_chaff_late,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/bel_hmp-250,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/damage,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/dummy,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/fin_cal_100mm_d10_tk,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/firedecal_testing,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/fr_alouette_4xM2HB,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/fr_am-39,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_as11,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_as12,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_cal_30mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/fr_e15,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_f17_mod1,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/fr_f17_mod2,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/fr_f17p,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/fr_l3,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_l5_mod3,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_mm-38,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_r530em,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_r550,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_samp_t21,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/fr_samp_t25,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/fr_sm-39,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_super-530f,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/fr_tank_1170_f1,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/ger_dm1,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/ger_dm2,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/ger_sst4,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/ir_107mm_rocket,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/iriaf_tank_370_f-4e,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/iriaf_tank_600_f-4e,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/is_gabriel_2,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/is_gabriel_3,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/is_gabriel_3as,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/it_a-244s_air,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/it_aspide_1,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/it_otomat_mk1,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/it_seakiller_2,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/jasdf_asm-1,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/jasdf_tank_830_f-1,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/jmsdf_type54,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/jmsdf_type80,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/jsdf_sam1,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/knm_penguin_mk2,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/knm_terne_shell,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/knm_tp612,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/knm_tp613,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/nv_cal_100mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/nv_cal_40mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/nv_cal_57mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/pla_depth_charge,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/pla_fueltank760,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/pla_hy-3,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/pla_pl-2,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/pla_pl-2b,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/pla_pl-5b,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/pla_pl-5c,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/pla_type-2,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/pla_type-3-250,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/pla_type-3-500,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/pla_yj-1,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/pla_yj-6,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_cal_130mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/plan_cal_85mm_lt,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/plan_hq-61,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/plan_hy-1,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_hy-1a,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_hy-1j,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_hy-2,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_hy-4,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_skf-1,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/plan_skf-2,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/plan_sy-1,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_sy-1a,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_type62dc,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/plan_type75dc,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/plan_yj-8,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_yu-1,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_yu-1g,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_yu-3,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/plan_yu-4,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/raf_bl755,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/raf_rapier,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/ran_ikara,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/rn_cal_113mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/rn_cal_114mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/rn_cal_30mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/rn_dc_mk11,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/rn_limbo_shell,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/rn_mark20s,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/rn_mark23,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/rn_mark8_mod4,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/rn_mark9_mod2,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/rn_seacat,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/rn_seacat_mk2,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/rn_squid_shell,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/suicide_bomb,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/swe_375mm_rocket,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/swe_cal_120mm_ersta,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usa_bgm-71a,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usa_bgm-71c,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usa_bgm-71d,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usa_m26,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usa_mim-14,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usa_mim-23,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usaf_agm-86c,LandAttack,Primary,GAME;WEAPONS,"Land-attack weapon; native ASuW target enum also covers land, but Vessel is explicitly excluded."
+ammunition/usaf_aim-9e,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usaf_aim-9j,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usaf_aim-9p,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usaf_alq-119,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_cbu-24,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_gbu-15,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_gbu-2,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_m117,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_m118,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_pave_spike,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_pilot_f-15c,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_pilot_potus,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_suu-23,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_tank_150_f-5,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_tank_150_f-5a,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_tank_230_av-8a,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_tank_370_f-4e,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_tank_370_f-5,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_tank_600_f-4e,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usaf_tank_610_f-15,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usmc_quad_tow,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_adc_mk1_noisemaker,Decoy,Primary,GAME;WEAPONS,Acoustic countermeasure; decoy main icon already expresses its function.
+ammunition/usn_agm-122a,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_agm-123,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_agm-12b,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_agm-45,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_agm-65b,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_agm-78,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_agm-84a,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_agm-84c,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_agm-84d,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_agm-88a,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-54a,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-7d,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-7e,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-7e2,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-7e4,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-7f,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-7m,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-9b,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-9c,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-9d,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-9g,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-9h,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-9l,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_aim-9m,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_alq-99,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_an_slq_25_nixie_decoy,Decoy,Primary,GAME;WEAPONS,Acoustic countermeasure; decoy main icon already expresses its function.
+ammunition/usn_cal_05in,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_105mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_127mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_152mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_155mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_203mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_203mm_clgp,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_203mm_rap,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_20mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_20mm_apds,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_25mm_m2,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_35mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_3in50,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_406mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_40mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_5in25,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_5in38,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_75mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_cal_76mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_d-704,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_fa-18_tank_330,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_gbu-10,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_gbu-12,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_gbu-16,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_gbu-24,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_hydra,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_lau-10a,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_lau-117,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_lau-118,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_lau-33,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_lau-35,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_lau-3a,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_lau-68,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mer,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mer_mk82_6,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mer_mk82_snakeye_6,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mer_rockeye_6,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mk-81,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mk-82,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mk-82_snakeye,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mk-83,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mk-84,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_mk16,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_mk37,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk37_mod1,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk37_mod2,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk37_mod3,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk37c,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk37e,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk44_air,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_mk44_ship,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_mk46_air,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_mk46_mod5_air,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk46_mod5_ship,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk46_ship,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_mk48,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk48_mod4,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk48_mod4_adcap,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_mk54_dc,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_moss,Decoy,Primary,GAME;WEAPONS,Acoustic countermeasure; decoy main icon already expresses its function.
+ammunition/usn_pilot_a-6,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_pilot_a-7,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_pilot_f-14a,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_pilot_f-4,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_pilot_president_pod,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_pilot_ra-5c,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_pilot_s-3a,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_pod_aww-9,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_pod_m260,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_rgm-109b,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_rgm-109c,LandAttack,Primary,GAME;WEAPONS,"Land-attack weapon; native ASuW target enum also covers land, but Vessel is explicitly excluded."
+ammunition/usn_rgm-84a,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_rgm-84c,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_rgm-84d,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_rgm-8h,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_rim-24b,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-2f,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-66a,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-66b,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-66c,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-66d,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-66e,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-66g,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-66h,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-67a,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-67b,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-67c,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-7,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-7h,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-7m,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rim-8,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/usn_rockeye,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_rr144_chaff,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_rum-139a,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_rur-5,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_ssq-101,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/usn_ssq-41,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/usn_ssq-47,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/usn_ssq-53,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/usn_ssq-62,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/usn_ssq-77,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/usn_tank_150_v-19a,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_tank_267_f-14,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_tank_280_f-14,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_tank_300_a-6,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_tank_300_a-6_c,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_tank_370_f-4j,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_tank_600_f-4j,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_tank_60gal_sh-2,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_ter,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_ter_gbu12,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_ter_mk82_3,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_ter_mk82_snakeye_3,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_ter_mk83_3,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_ugm-109b,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_ugm-109c,LandAttack,Primary,GAME;WEAPONS,"Land-attack weapon; native ASuW target enum also covers land, but Vessel is explicitly excluded."
+ammunition/usn_ugm-84a,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_ugm-84b,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_ugm-84c,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/usn_walleye2,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/usn_zuni,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_152mm_2a33,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_45-36nu,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_53-38,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_53-39,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_53-56v,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_53-61,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_53-65K,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_65-76,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-10a,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-10b,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-10c,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-10d,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-11,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-2-2,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-2a,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-2c,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-2d,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-3e,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-3f,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-6a,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-6b,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-6c,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-6d,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-7c,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-7d,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aa-8,AirSuperiority,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_aircraft_chaff,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_aku-58,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_apk-9,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_apr-2,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-10,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-11,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-12,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-13,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-14a,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-14b,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-2,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-2b,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-4,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-4b,LandAttack,Primary,GAME;WEAPONS,"Land-attack weapon; native ASuW target enum also covers land, but Vessel is explicitly excluded."
+ammunition/wp_as-6,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_as-7,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_at-1,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_at-10,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_at-2,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_at-6,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_at-6_rack,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_b8m-1,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_05in,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_100mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_100mm_cm5,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_100mm_d10,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_125mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_130mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_130mm_ss,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_14mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_152mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_23mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_25mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_30mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_30mm_ak230,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_37mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_57mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_57mm_zsu,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_76mm,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_cal_76mm_d56,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_dc_shell,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_dc_shell_helicopter,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fab-100,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fab-1500_m54,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fab-250,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fab-3000_m54,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fab-500,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fab-500_m54,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fab-9000_m54,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fantasmagoria,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fueltank3000_w,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fueltank400_w,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fueltank450_w,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fueltank600_f,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fueltank800_f,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_fueltank800_w,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_grad,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_kab-500l,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_mg-44,Decoy,Primary,GAME;WEAPONS,Acoustic countermeasure; decoy main icon already expresses its function.
+ammunition/wp_mg-74,Decoy,Primary,GAME;WEAPONS,Acoustic countermeasure; decoy main icon already expresses its function.
+ammunition/wp_noisemaker,Decoy,Primary,GAME;WEAPONS,Acoustic countermeasure; decoy main icon already expresses its function.
+ammunition/wp_oro-57k,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pilot_a,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pilot_d,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pilot_k1m_a,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pilot_k1m_d,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_plab-100,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pod_delta_fcr,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pod_kkrm_vrecon,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pod_rfk-t_vrecon,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pod_siren_jammer_f,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pod_siren_jammer_w,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_pod_tangazh_elint,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_rbk-250,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_rbk-500,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_rgb-1,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/wp_rgb-10,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_rgb-12,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_rgb-25,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_rgb-3,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/wp_rgb-60,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_rgb-nm1,Surveillance,Primary,GAME;WEAPONS,Acoustic sensing device.
+ammunition/wp_s-24,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_s-25,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_s-25_pod,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_s-5,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_s-8,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_sa-11,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-13,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_sa-2,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_sa-3,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_sa-4,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-5,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_sa-6,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-8,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_sa-n-1,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-10,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_sa-n-12,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-1c,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-1d,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-3,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-3b,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-4,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-4c,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-5,AirDefence,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_sa-n-6,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-7,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_sa-n-9,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_saet-50,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_set-40,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_set-53,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_set-65,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-1c,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-12,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-14a,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-14b,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+ammunition/wp_ss-n-16,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-19,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-2,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-22,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-22b,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-2c,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-3,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-3b,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-7,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ss-n-9,SurfaceWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_tank_5280_mig-25,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_tank_800_ko-45,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_test-71,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_test-71m,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_ua,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_ub-16-57,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_ub-16-57KV,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_ub-16-57UM,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_umgt-1,AntiSubmarineWarfare,Primary,GAME;WEAPONS,Single native target domain; launch/target designation is intrinsic to this weapon.
+ammunition/wp_upk_23-250,,Unrepresented,GAME;WEAPONS,Supporting payload/projectile; no platform mission modifier.
+ammunition/wp_uset-80,,Multipurpose,GAME;WEAPONS,Multiple explicit target domains; preserve capabilities without target priority.
+biologic/bio_blue_whale,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+biologic/bio_fin_whale,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+biologic/bio_humpback_whale,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/airfield_small_1,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/civ_car_pickup_1983_type63,LandAttack,Primary,GAME;ARMY,Land fires platform.
+land_units/civ_car_pickup_1983_ub-16,LandAttack,Primary,GAME;ARMY,Land fires platform.
+land_units/civ_car_pickup_1983_zu-23,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/civ_comm_buildings,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/civ_radiostation,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/civ_spar_rig,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/civ_tgt_bridge_3_part,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/civ_tgt_bridge_6_part,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/civ_tgt_bridge_arches_6_part,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/fin_100_56_tk,SurfaceWarfare,Primary,GAME;NWP,Coastal defence battery.
+land_units/iqa_mbt_t-55_70,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/is_airbase_akureyri,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/is_airbase_isafjordur,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/is_airbase_keflavik,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/is_airbase_reykjavik,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/jsdf_apc_type60,Transport,Primary,GAME;ARMY,Personnel/cargo transport platform.
+land_units/jsdf_apc_type73,Transport,Primary,GAME;ARMY,Personnel/cargo transport platform.
+land_units/jsdf_mbt_type74,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/jsdf_sam_type81,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/nato_aaa_gdf,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/nato_ewr_station,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/nato_fps-20_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/nato_fps-6_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/nato_large_ewr_station,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/nato_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/nato_sam_skyguard,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/nato_small_airbase,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/nato_tps-27_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/nato_very_small_airbase,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/nv_130mm_coastal_artillery,SurfaceWarfare,Primary,GAME;NWP,Coastal defence battery.
+land_units/nv_bofors,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/nv_coastal_artillery,SurfaceWarfare,Primary,GAME;NWP,Coastal defence battery.
+land_units/nv_headquarters,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/nv_ks-19,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/nv_mlrs_grad_emplacement,LandAttack,Primary,GAME;ARMY,Land fires platform.
+land_units/nv_pt_boats_docks,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/nv_pt_boats_docks_small,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/nv_s-60,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/nv_watchtower,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/nv_zu-23,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/oil_terminal_1,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/oil_terminal_2,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/oil_terminal_3,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/pla_aaa_type55,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/pla_aaa_type65,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/pla_apc_type63,Transport,Primary,GAME;ARMY,Personnel/cargo transport platform.
+land_units/pla_hy-1_launcher,SurfaceWarfare,Primary,GAME;NWP,Dedicated coastal anti-ship battery.
+land_units/pla_hy-2_launcher,SurfaceWarfare,Primary,GAME;NWP,Dedicated coastal anti-ship battery.
+land_units/pla_hy-3_launcher,SurfaceWarfare,Primary,GAME;NWP,Dedicated coastal anti-ship battery.
+land_units/pla_hy-4_launcher,SurfaceWarfare,Primary,GAME;NWP,Dedicated coastal anti-ship battery.
+land_units/pla_lt_type_63,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/pla_spaag_type63,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/port_ashdod,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_belfast,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_chennai,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_cochin,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_diu,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_dover,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_dublin,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_eastcoast_charleston,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_eastcoast_halifax,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_eastcoast_jacksonville,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_eastcoast_mayport,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_eastcoast_newport,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_eastcoast_norfolk,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_felixstowe,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_haifa,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_hmnb_clyde,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_holyhead,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_karachi,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_latakia,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_liverpool,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_lossiemouth,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_milford_haven,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_mumbai,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_asaluyeh,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_bandar_abbas,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_bandar_lengeh,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_bushehr,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_dammam,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_fujairah,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_kish,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_kuwait,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_minah_al_ahmadi,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_pg_umm_quasr,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_plymouth,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_portsmouth,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_telaviv,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_ussr_kandalaksha,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_ussr_severomorsk,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/port_weymouth,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/raf_rapier_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/swe_ersta,SurfaceWarfare,Primary,GAME;NWP,Coastal defence battery.
+land_units/tgt_ammo_depot_small,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_fueltanks_large,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_fueltanks_large_brown,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_fueltanks_medium,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_fueltanks_medium_sandy,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_fueltanks_small,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_fueltanks_small_brown,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_industry_buildings_1,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_industry_buildings_2,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_industry_buildings_2_brown,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_industry_buildings_3,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_industry_buildings_4,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_refinery_small,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_refinery_small_2,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/tgt_refinery_small_3,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/us_cobra_dane_ewr,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/usa_aaa_m42,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/usa_aaa_m51,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/usa_aaa_vulcan,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/usa_apc_aav7,Transport,Primary,GAME;ARMY,Personnel/cargo transport platform.
+land_units/usa_apc_m113,Transport,Primary,GAME;ARMY,Personnel/cargo transport platform.
+land_units/usa_car_hemtt,Transport,Primary,GAME;ARMY,Personnel/cargo transport platform.
+land_units/usa_car_hmmwv,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/usa_car_hmmwv_m2,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/usa_car_hmmwv_tow,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/usa_car_m923,Transport,Primary,GAME;ARMY,Personnel/cargo transport platform.
+land_units/usa_ifv_bradley,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/usa_mbt_abrams,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/usa_mbt_m60,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/usa_mim-23_fcr,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/usa_mim-23_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/usa_mim-23_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/usa_mlrs_m270,LandAttack,Primary,GAME;ARMY,Land fires platform.
+land_units/usa_radar_tps-43,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/usa_radar_tps-63,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/usa_sam_site_nike_hercules,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/usa_spa_m109a2,LandAttack,Primary,GAME;ARMY,Land fires platform.
+land_units/usa_spa_m110a1,LandAttack,Primary,GAME;ARMY,Land fires platform.
+land_units/warehouses_1,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/warehouses_2,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/warehouses_3,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/wp_aaa_61k,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_aaa_ural_61k,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_aaa_ural_s-60,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_aaa_ural_zu-23,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_airbase_1,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/wp_airbase_2,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/wp_airbase_3,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/wp_airbase_4,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/wp_airbase_5,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/wp_asc_redut,SurfaceWarfare,Primary,GAME;NWP,Dedicated coastal anti-ship battery.
+land_units/wp_asc_rubezh,SurfaceWarfare,Primary,GAME;NWP,Dedicated coastal anti-ship battery.
+land_units/wp_car_ural,Transport,Primary,GAME;ARMY,Personnel/cargo transport platform.
+land_units/wp_car_ural_command,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/wp_cross_slot,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_large_pvo_airbase,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+land_units/wp_lt_pt-76,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/wp_mbt_t-55,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/wp_mbt_t-55m,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/wp_mbt_t-72a,,Multipurpose,GAME;ARMY,General combat/support platform; no role forced from weapons or AI priorities.
+land_units/wp_mlrs_bm-21,LandAttack,Primary,GAME;ARMY,Land fires platform.
+land_units/wp_p-10_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_p-14_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_p-15_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_p-18_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_p-19_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_p-35_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_sa-10_flaplid,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_sa-10_tel,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sa-11_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sa-11_radar,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_sa-13_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sa-3_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sa-4_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sa-4_longtruck,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_sa-4_pathand,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_sa-5_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sa-5_squarepair,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_sa-6_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sa-6_straightflush,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_sa-7_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sa-8_launcher,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sam_site_sa-10,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sam_site_sa-11,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sam_site_sa-11_small,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sam_site_sa-2,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sam_site_sa-2_modernized,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sam_site_sa-3,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_sam_site_sa-5,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+land_units/wp_silkworm_launcher,SurfaceWarfare,Primary,GAME;NWP,Dedicated coastal anti-ship battery.
+land_units/wp_son-9,Surveillance,Primary,GAME;ADA,Sensing/early-warning platform.
+land_units/wp_spa_2s3,LandAttack,Primary,GAME;ARMY,Land fires platform.
+land_units/wp_tbm_scud_b_tel,LandAttack,Primary,GAME;ARMY,Land fires platform.
+land_units/wp_zsu-57,AirDefence,Primary,GAME;ADA,Air-defence weapon system; represented by its SAM/AAA main icon.
+vessels/all_assault_raft,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/all_life_raft,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/all_life_raft_open,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/all_life_raft_single,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/all_pod_president,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_crabboat,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_dhow,,Unspecified,GAME,No supported principal mission in the current role vocabulary.
+vessels/civ_fv_fishingboat_a,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_fishingboat_b,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_fishingboat_c,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_fishingboat_d,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_okean,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_sampan,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_fv_sidetrawler,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_sterntrawler_a,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_sterntrawler_b,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_sterntrawler_c,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_fv_sterntrawler_d,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/civ_ms_act_1,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_amra,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_andizhan,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_bulk,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_c7s68,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_c8,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_car_carrier_a,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_encounter,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_freighter_a,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_freighter_b,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_freighter_d,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_irkutsk,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_ivan_franko,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_kommunist,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_mairangi_bay,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_mercur,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_metallurg_anosov,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_murom,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_poltava,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_ritina,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_roro_a,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_roro_b,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_roro_c,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_seabee,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_sealift_pacific,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_slavyansk,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_super_p,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/civ_ms_yuniy_partizan,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/es_ffg_baleares,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/es_ss_galerna,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/es_ssk_delfin,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/fgs_ddg_lutjens,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/fgs_ptg_tiger,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/fgs_ss_type_205,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/fgs_ss_type_206,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/fr_ss_agosta,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/fr_ss_daphne,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/ins_ff_blackwood,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/ins_pt_saar,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ins_ptg_aliya,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ins_ptg_hetz,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ins_ptg_saar_2,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ins_ptg_saar_3,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ins_ptg_saar_4,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ins_ss_gal,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/ir_aor_delvar,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/ir_fab_boghammar,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ir_ffg_alvand,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/ir_pf_bayandor,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/ir_pt_kaivan,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ir_pt_parvin,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ir_ptg_combattante_ii,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/ir_ptg_kaivan,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/jmsdf_dd_hatsuyuki,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/jmsdf_dd_minegumo,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/jmsdf_dd_takatsuki,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/jmsdf_dd_takatsuki_84,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/jmsdf_dd_yamagumo,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/jmsdf_ddg_tachikaze,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/jmsdf_ddg_tachikaze_84,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/jmsdf_ddh_haruna,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/jmsdf_ss_asashio,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/jmsdf_ss_uzushio,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/jmsdf_ss_yushio,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/knm_ffg_oslo,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/knm_fs_sleipner,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/knm_msc_sauda,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/knm_ptg_hauk,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/knm_ptg_snogg,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/knm_ss_kobben,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/ln_ptg_beir_grassa,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/nrp_ssk_albacora,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/nv_agi_sampan,Reconnaissance,Primary,GAME;SOVIET,Intelligence collection vessel.
+vessels/plan_ap_qiongsha,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/plan_dd_luda1,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/plan_ff_chengdu,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/plan_ff_jianghu1,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/plan_ff_jianghu2,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/plan_ff_jianghu3,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/plan_ffg_jiangdong,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/plan_k_type_037,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/plan_lst_yukan,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/plan_msc_type_010,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/plan_pt_shanghai2,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/plan_pt_shanghai2b,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/plan_ptg_type_021,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/plan_ptg_type_024,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/plan_ss_romeo,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/plan_ssg_wuhan,SurfaceWarfare,Primary,GAME;SOVIET,In-game anti-ship cruise-missile submarine generation; not modern land-attack SSGN policy.
+vessels/plan_ssn_han,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/pns_ss_hangor,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/pns_ss_hashmat,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/ran_ddg_perth,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/ran_ffg_adelaide_shorthull,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/ran_ss_oberon,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/rcn_ss_oberon,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/rn_dd_battle,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/rn_dd_c-class,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/rn_dd_z-class,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/sea_mine,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/usn_ae_kilauea,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/usn_ao_t2,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/usn_aoe_sacramento,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/usn_avp_barnegat,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_avp_barnegat_mod,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_bb_iowa,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_cg_belknap,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cg_belknap_72,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cg_bunker_hill,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cg_leahy,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cg_leahy_68,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cg_ticonderoga,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cgn_alaska,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cgn_california,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cgn_long_beach_73,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cgn_long_beach_83,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cgn_virginia,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_clg_oklahoma_city,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/usn_cv_america_79,,Multipurpose,GAME;CARRIER,Air wing and supported missions vary; carrier physical type is independent of strike role.
+vessels/usn_cv_forrestal_75,,Multipurpose,GAME;CARRIER,Air wing and supported missions vary; carrier physical type is independent of strike role.
+vessels/usn_cv_kitty_hawk,,Multipurpose,GAME;CARRIER,Air wing and supported missions vary; carrier physical type is independent of strike role.
+vessels/usn_cvn_enterprise,,Multipurpose,GAME;CARRIER,Air wing and supported missions vary; carrier physical type is independent of strike role.
+vessels/usn_cvn_nimitz,,Multipurpose,GAME;CARRIER,Air wing and supported missions vary; carrier physical type is independent of strike role.
+vessels/usn_dd_gearing,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_dd_gearing_fram2,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_dd_gearing_fram2_mod,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_dd_spruance,AntiSubmarineWarfare,Primary,GAME;SPRUANCE,"ASW was the principal design mission, including missile-upgraded variants."
+vessels/usn_dd_spruance_abl,AntiSubmarineWarfare,Primary,GAME;SPRUANCE,"ASW was the principal design mission, including missile-upgraded variants."
+vessels/usn_dd_spruance_vls,AntiSubmarineWarfare,Primary,GAME;SPRUANCE,"ASW was the principal design mission, including missile-upgraded variants."
+vessels/usn_ddg_adams_early,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ddg_adams_early_68,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ddg_adams_late,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ddg_adams_late_68,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ddg_coontz,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ddg_coontz_68,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ddg_kidd,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ddg_mahan,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ff_garcia,AntiSubmarineWarfare,Primary,GAME;ESCORT,Dedicated ocean antisubmarine escort family.
+vessels/usn_ff_knox,AntiSubmarineWarfare,Primary,GAME;ESCORT,Dedicated ocean antisubmarine escort family.
+vessels/usn_ff_knox_72,AntiSubmarineWarfare,Primary,GAME;ESCORT,Dedicated ocean antisubmarine escort family.
+vessels/usn_ff_knox_84,AntiSubmarineWarfare,Primary,GAME;ESCORT,Dedicated ocean antisubmarine escort family.
+vessels/usn_ffg_brooke,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ffg_oliver_hazard_perry,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ffg_oliver_hazard_perry_longhull,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_lha_tarawa,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/usn_lka_charleston,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/usn_lpd_austin,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/usn_lsm_lsm1,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/usn_lst_newport,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/usn_msc_adjutant,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/usn_mso_aggressive,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/usn_pb_pgm-39,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_phm_pegasus,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/usn_septar_qst-35,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_septar_qst-35_small,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/usn_ssbn_franklin,Strike,Primary,GAME;SSBN,Strategic ballistic missile mission.
+vessels/usn_ssbn_james_madison,Strike,Primary,GAME;SSBN,Strategic ballistic missile mission.
+vessels/usn_ssbn_lafayette,Strike,Primary,GAME;SSBN,Strategic ballistic missile mission.
+vessels/usn_ssn_los_angeles,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/usn_ssn_los_angeles_76,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/usn_ssn_permit,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/usn_ssn_permit_68,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/usn_ssn_skipjack,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/usn_ssn_skipjack_68,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/usn_ssn_sturgeon,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/usn_ssn_sturgeon_72,,Multipurpose,GAME;SUB,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/usn_takr_algol,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/wp_agi_okean,Reconnaissance,Primary,GAME;SOVIET,Intelligence collection vessel.
+vessels/wp_agi_okean_mod,Reconnaissance,Primary,GAME;SOVIET,Intelligence collection vessel.
+vessels/wp_bdk_alligator,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/wp_bdk_ivan_rogov,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/wp_bdk_ropucha,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/wp_bpk_kanin,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_bpk_kara,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_bpk_kashin,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_bpk_kashin_mod,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_bpk_kresta2,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_bpk_udaloy,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_cv_orel,,Unspecified,GAME,Unbuilt carrier proposal; no operational principal mission asserted.
+vessels/wp_em_sovremenny,SurfaceWarfare,Primary,GAME;SOVIET,Surface warfare design specialization.
+vessels/wp_kr_sverdlov,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/wp_mpk_grisha3,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_mrk_nanuchka,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_ms_andizhan_armed,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/wp_ms_mercur_decoy,,Unspecified,GAME;NWP,Game decoy vessel; no standard platform mission inferred from scenario behavior.
+vessels/wp_ms_roro_b,,Multipurpose,GAME;CARRIER;SOVIET,Air wing and supported missions vary; carrier physical type is independent of strike role.
+vessels/wp_msc_kondor,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/wp_msc_kondor_ii,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/wp_msc_kondor_ii_85,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/wp_msc_t43,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/wp_msc_t43k,MineWarfare,Primary,GAME;MINE,Mine or minesweeping specialization.
+vessels/wp_pb_don,Transport,Primary,GAME;NWP,"Submarine tender: logistic support vessel, not a submarine."
+vessels/wp_pb_zhuk,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/wp_pb_zhuk_me,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/wp_pkr_moskva,AntiSubmarineWarfare,Primary,GAME;SOVIET,Moskva helicopter ASW carrier specialization.
+vessels/wp_pt_libelle,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_pt_p4,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_pt_p6,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_pt_shershen,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_pt_shershen-e,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_pt_shershen-er,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/wp_pt_stenka,,Multipurpose,GAME;NWP,General escort/patrol/surface combatant; no unsupported mission priority.
+vessels/wp_pt_turya,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_pt_wisla,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_ptg_komar,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_ptg_osa1,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_ptg_osa2,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_ptg_tarantul,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_ptg_tarantul_re,SurfaceWarfare,Primary,GAME;NWP,Surface attack craft; missile and torpedo capabilities remain independent.
+vessels/wp_rkr_kirov,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/wp_rkr_kresta1,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/wp_rkr_kynda,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/wp_rkr_slava,GuidedMissile,Designation,GAME;NWP,Explicit guided-missile designation retained as owner-requested capability modifier; not a claim of one tactical mission.
+vessels/wp_skr_krivak1,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_skr_krivak2,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_skr_petya2,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_skr_petya3,AntiSubmarineWarfare,Primary,GAME;SOVIET,"Antisubmarine design specialization, preserving other capabilities."
+vessels/wp_ss_foxtrot,,Multipurpose,GAME;SUB;SOVIET,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/wp_ss_kilo,,Multipurpose,GAME;SUB;SOVIET;KILO,Patrol submarine with both anti-ship and antisubmarine capabilities; no primary.
+vessels/wp_ss_romeo,,Multipurpose,GAME;SUB;SOVIET,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/wp_ss_tango,,Multipurpose,GAME;SUB;SOVIET,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/wp_ssbn_delta3,Strike,Primary,GAME;SSBN;SOVIET,Strategic ballistic missile mission.
+vessels/wp_ssbn_yankee,Strike,Primary,GAME;SSBN;SOVIET,Strategic ballistic missile mission.
+vessels/wp_ssgn_charlie1,SurfaceWarfare,Primary,GAME;SOVIET,In-game anti-ship cruise-missile submarine generation; not modern land-attack SSGN policy.
+vessels/wp_ssgn_charlie2,SurfaceWarfare,Primary,GAME;SOVIET,In-game anti-ship cruise-missile submarine generation; not modern land-attack SSGN policy.
+vessels/wp_ssgn_echo2,SurfaceWarfare,Primary,GAME;SOVIET,In-game anti-ship cruise-missile submarine generation; not modern land-attack SSGN policy.
+vessels/wp_ssgn_oscar1,SurfaceWarfare,Primary,GAME;SOVIET,In-game anti-ship cruise-missile submarine generation; not modern land-attack SSGN policy.
+vessels/wp_ssn_alfa,,Multipurpose,GAME;SUB;SOVIET,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/wp_ssn_november,,Multipurpose,GAME;SUB;SOVIET,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/wp_ssn_victor1,,Multipurpose,GAME;SUB;SOVIET,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/wp_ssn_victor2,,Multipurpose,GAME;SUB;SOVIET,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/wp_ssn_victor3,,Multipurpose,GAME;SUB;SOVIET,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/wp_ssn_victor3_imp,,Multipurpose,GAME;SUB;SOVIET,General-purpose torpedo submarine; no preference between anti-ship and antisubmarine missions.
+vessels/wp_takr_kiev,,Multipurpose,GAME;CARRIER;SOVIET,Air wing and supported missions vary; carrier physical type is independent of strike role.
+vessels/wp_vt_boris_chilikin,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.
+vessels/wp_vt_kazbek,Transport,Primary,GAME;NWP,Transport/logistic platform; no combat mission inferred from defensive weapons.

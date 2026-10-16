@@ -6,12 +6,18 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="../../platform-roles.ini" Link="platform-roles.ini" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="Program.cs" />
     <Compile Include="../../managed/runtime/RuntimeConfiguration.cs" />
     <Compile Include="../../managed/runtime/RuntimeMailbox.cs" />
     <Compile Include="../../managed/runtime/TransportWorker.cs" />
     <Compile Include="../../managed/runtime/INativeTransport.cs" />
     <Compile Include="../../managed/runtime/NativeTransport.cs" />
+    <Compile Include="../../managed/runtime/IniPlatformRoleMappingProvider.cs" />
+    <Compile Include="../../../SeaPower.Client/managed/src/NavalCommand/SeaPower/Client/ClassificationMapping.cs" Link="ClassificationMapping.cs" />
     <ProjectReference Include="$(GatewayApiSource)/managed/Gateway.Api.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../classification/platform-primary-roles.csv" Link="platform-primary-roles.csv" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

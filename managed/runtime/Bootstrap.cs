@@ -97,8 +97,9 @@ public sealed class Bootstrap : BaseUnityPlugin
         attached = true;
         try
         {
-            var runtimeType = typeof(Bootstrap).Assembly.GetType("NavalCommand.SeaPower.Mod.Runtime", true);
-            runtime = Activator.CreateInstance(runtimeType);
+            var compositionRoot = typeof(Bootstrap).Assembly.GetType("NavalCommand.SeaPower.Mod.CompositionRoot", true);
+            runtime = compositionRoot.GetMethod("Create").Invoke(null, new object[] { preparation.Configuration });
+            var runtimeType = runtime.GetType();
             stopRuntime = runtimeType.GetMethod("Stop");
             runtimeType.GetMethod("Install").Invoke(runtime, new object[] { preparation.Configuration, (Action<string>)Report });
             Logger.LogInfo("Production runtime attached independently.");
