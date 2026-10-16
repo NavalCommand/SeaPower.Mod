@@ -90,12 +90,23 @@ $harnessPluginDirectory = Join-Path $GameRoot 'BepInEx/plugins/NavalCommand.Harn
 $fixturePluginDirectory = Join-Path $GameRoot 'BepInEx/plugins/NavalCommand.Fixture'
 foreach ($directory in @($runtimePluginDirectory, $harnessPluginDirectory, $fixturePluginDirectory)) {
     if (Test-Path -LiteralPath $directory) {
-        throw "An existing deployment must be left untouched: $directory"
+        throw "An existing deployment must be left untouched: $directory. A previous launcher may have been interrupted; inspect its session logs and deployment.json before recovering its files."
     }
 }
 $doorstopPath = Join-Path $GameRoot 'doorstop_config.ini'
 $originalDoorstop = [IO.File]::ReadAllBytes($doorstopPath)
 $originalDoorstopHash = (Get-FileHash -LiteralPath $doorstopPath).Hash
+# Keep rollback evidence on disk in case the launcher itself is terminated.
+[IO.File]::WriteAllBytes((Join-Path $runDirectory 'doorstop.original.ini'), $originalDoorstop)
+[ordered]@{
+    gameRoot = [IO.Path]::GetFullPath($GameRoot)
+    launcherPid = $PID
+    createdUtc = [DateTime]::UtcNow.ToString('o')
+    originalDoorstopSha256 = $originalDoorstopHash
+    runtimePluginDirectory = $(if ($useRuntime) { $runtimePluginDirectory } else { $null })
+    harnessPluginDirectory = $(if ($useHarness) { $harnessPluginDirectory } else { $null })
+    fixturePluginDirectory = $(if ($FixtureAssembly) { $fixturePluginDirectory } else { $null })
+} | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $runDirectory 'deployment.json')
 $executable = (Resolve-Path -LiteralPath (Join-Path $GameRoot 'Sea Power.exe')).Path
 $startInfo = [Diagnostics.ProcessStartInfo]::new($executable)
 $startInfo.WorkingDirectory = $GameRoot

@@ -13,9 +13,10 @@ internal static class CompositionRoot
         }
 
         var roleMappings = new IniPlatformRoleMappingProvider(configuration.PlatformRoleMappingsPath);
+        var alternativeDisplayNames = new IniAlternativeDisplayNameProvider(configuration.AlternativeDisplayNamesPath);
         ClassificationMode mode = configuration.ClassificationMode == "aggressive"
             ? ClassificationMode.Aggressive : ClassificationMode.Safe;
-        var game = new NativeGameFacade(roleMappings, mode);
+        var game = new NativeGameFacade(roleMappings, alternativeDisplayNames, mode);
         return new Runtime(game);
     }
 }

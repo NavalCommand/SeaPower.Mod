@@ -7,5 +7,6 @@
  "maxMessageBytes": 16777216,
  "maxQueuedControls": 64,
  "classificationMode": "safe",
- "platformRoleMappings": "platform-roles.ini"
+ "platformRoleMappings": "platform-roles.ini",
+ "alternativeDisplayNames": "alternative-display-names.en.ini"
 }

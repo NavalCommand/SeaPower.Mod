@@ -20,7 +20,9 @@ public sealed class RuntimeConfiguration
     [DataMember(Name = "logDirectory")] public string LogDirectory { get; set; }
     [DataMember(Name = "classificationMode")] public string ClassificationMode { get; set; }
     [DataMember(Name = "platformRoleMappings")] public string PlatformRoleMappings { get; set; }
+    [DataMember(Name = "alternativeDisplayNames")] public string AlternativeDisplayNames { get; set; }
     public string PlatformRoleMappingsPath { get; private set; }
+    public string AlternativeDisplayNamesPath { get; private set; }
 
     public static RuntimeConfiguration Load(string moduleDirectory)
     {
@@ -63,6 +65,7 @@ public sealed class RuntimeConfiguration
         configuration.LogDirectory = ResolvePath(moduleDirectory, Environment.GetEnvironmentVariable("NC_MOD_LOG_DIRECTORY")
             ?? configuration.LogDirectory ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NavalCommand", "SeaPower.Mod"));
         configuration.PlatformRoleMappingsPath = ResolvePath(moduleDirectory, configuration.PlatformRoleMappings ?? "platform-roles.ini");
+        configuration.AlternativeDisplayNamesPath = ResolvePath(moduleDirectory, configuration.AlternativeDisplayNames ?? "alternative-display-names.ru.ini");
         return configuration;
     }
 
