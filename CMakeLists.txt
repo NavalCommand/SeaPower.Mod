@@ -16,6 +16,6 @@ include("${ncbuild_SOURCE_DIR}/NavalCommand.Build.CMake.cmake")
 NavalCommandAddDependency(https://github.com/NavalCommand/Gateway.Api.git 94cca460b5d44d7c4211a6e8f06a5af3be2b6fd2)
 NavalCommandAddDependency(https://github.com/NavalCommand/Gateway.Grpc.Api.git 82216b583f82fc60d784cc9d1a62b3488a99a88e)
 NavalCommandAddDependency(https://github.com/NavalCommand/Gateway.Grpc.git 291a296f4d3ee4df1d978038d110c5b3faad116a)
-NavalCommandAddDependency(https://github.com/NavalCommand/SeaPower.Client.git 4bec78801b37638272da8710005140d217f65d06)
+NavalCommandAddDependency(https://github.com/NavalCommand/SeaPower.Client.git 9dae989219b77c149147366c589a9b70ea6778d0)
 
 NavalCommandConfigureModule()
