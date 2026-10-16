@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -36,32 +37,29 @@ Check(mappings.TryGetPrimaryRole("vessels/unarmed", out var clearedPrimary) && c
 Check(!mappings.TryGetPrimaryRole("vessels/unmapped", out _), "unmapped primary role retains the native default");
 string defaultMappingPath = Path.Combine(AppContext.BaseDirectory, "platform-roles.ini");
 var defaults = new IniPlatformRoleMappingProvider(defaultMappingPath);
-foreach (string configuredType in new[] { "vessels/wp_bpk_udaloy", "vessels/wp_ss_kilo" })
+Check(defaults.TryGetRoles("vessels/wp_bpk_udaloy", out var udaloyCapabilities) && udaloyCapabilities.Contains(PlatformRole.AntiSubmarineWarfare),
+    "Udaloy retains ASW capability");
+Check(defaults.TryGetPrimaryRole("vessels/wp_bpk_udaloy", out var udaloyPrimary) && udaloyPrimary == PlatformRole.AntiSubmarineWarfare,
+    "Udaloy retains principal ASW role");
+foreach (string typeId in new[] { "vessels/wp_ss_kilo", "vessels/usn_cvn_nimitz", "aircraft/usn_fa-18a", "aircraft/usn_f-4j" })
 {
-    Check(defaults.TryGetRoles(configuredType, out var capabilities) && capabilities.Contains(PlatformRole.AntiSubmarineWarfare),
-        "reported ASW platform has configured capabilities");
-    Check(defaults.TryGetPrimaryRole(configuredType, out var principalRole) && principalRole == PlatformRole.AntiSubmarineWarfare,
-        "reported ASW platform has an explicit configured primary role");
+    Check(defaults.TryGetPrimaryRole(typeId, out var primary) && !primary.HasValue, "multipurpose type explicitly clears native primary: " + typeId);
+    Check(defaults.TryGetRoles(typeId, out var roles) && roles.Count > 0, "multipurpose platform retains capabilities: " + typeId);
 }
-string mappingSection = "";
-foreach (string rawLine in File.ReadLines(defaultMappingPath))
+var reviewedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+foreach (string line in File.ReadLines(Path.Combine(AppContext.BaseDirectory, "platform-primary-roles.csv")).Skip(1))
 {
-    string line = rawLine.Split(';')[0].Trim();
-    if (line.StartsWith("[", StringComparison.Ordinal))
-    {
-        mappingSection = line;
-    }
-    else if (mappingSection == "[PlatformRoles]" && line.Contains('='))
-    {
-        string typeId = line.Substring(0, line.IndexOf('='));
-        Check(defaults.TryGetRoles(typeId, out var capabilities), "default entry parses");
-        if (capabilities.Count > 0)
-        {
-            Check(defaults.TryGetPrimaryRole(typeId, out var principalRole) && principalRole.HasValue && capabilities.Contains(principalRole.Value),
-                "every default type with platform roles has an explicit primary role in its capabilities: " + typeId);
-        }
-    }
+    // The first two columns contain identifiers/enums with no CSV quoting.
+    string[] fields = line.Split(',');
+    string typeId = fields[0];
+    string expectedPrimary = fields[1];
+    Check(reviewedIds.Add(typeId), "one reviewed decision per exact type");
+    Check(defaults.TryGetRoles(typeId, out var capabilities), "reviewed type has capability entry: " + typeId);
+    Check(defaults.TryGetPrimaryRole(typeId, out var reviewedPrimary), "reviewed type has explicit primary presence/absence: " + typeId);
+    Check((reviewedPrimary?.ToString() ?? "") == expectedPrimary, "generated primary agrees with reviewed decision: " + typeId);
+    Check(!reviewedPrimary.HasValue || capabilities.Contains(reviewedPrimary.Value), "present primary belongs to capabilities: " + typeId);
 }
+Check(reviewedIds.Count == 1002, "complete installed platform and ammunition review inventory");
 foreach (string invalidPrimary in new[] { "SurfaceWarfare,AirDefence", "NotARole", "0" })
 {
     File.WriteAllText(Path.Combine(directory, "platform-roles.ini"), "[PrimaryPlatformRoles]\nvessels/example=" + invalidPrimary + "\n");

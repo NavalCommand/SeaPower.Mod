@@ -17,4 +17,7 @@
     <Compile Include="../../../SeaPower.Client/managed/src/NavalCommand/SeaPower/Client/ClassificationMapping.cs" Link="ClassificationMapping.cs" />
     <ProjectReference Include="$(GatewayApiSource)/managed/Gateway.Api.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="../../classification/platform-primary-roles.csv" Link="platform-primary-roles.csv" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

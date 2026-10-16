@@ -30,16 +30,23 @@ vessels/wp_ss_kilo=AntiSubmarineWarfare,SurfaceWarfare
 
 [PrimaryPlatformRoles]
 vessels/wp_bpk_udaloy=AntiSubmarineWarfare
-vessels/wp_ss_kilo=AntiSubmarineWarfare
+vessels/wp_ss_kilo=
 ```
 
-The bundled defaults contain an explicit primary entry for every type with a
-nonempty capability list. Civilian objects, animals and static scenery can have
-no applicable platform role. Add explicit entries for custom content as needed.
+The bundled defaults explicitly review all installed original platform and
+ammunition definitions. A multipurpose platform may retain several capabilities
+with no primary role: Kilo, general-purpose attack submarines and fleet carriers
+are deliberate examples. Missing historical evidence, fictional types and
+specializations outside the current role vocabulary also remain unset, with
+separate reasons recorded in [the review ledger](classification/platform-primary-roles.csv).
+See [sources and classification policy](classification/SOURCES.md) for research,
+family-level inferences and scope limits.
+
 `scripts/Generate-PlatformRoleMappings.ps1 -GameRoot <path>` regenerates the file
-from native roles plus the script's authored classification policy. Regeneration
-replaces local edits: preserve any custom mappings first. Generated primary choices
-are editable policy, rather than claims about active native missions.
+from native capabilities and the reviewed ledger. It rejects duplicate, missing
+and stale review entries. Add a reviewed row for new content rather than deriving
+priority from capability order. Regeneration replaces local INI edits; preserve
+custom mappings first. No original game content is changed.
 
 Package targets: NavalCommand.SeaPower.Mod.PackageRuntime and NavalCommand.SeaPower.Mod.PackageHarness. Configuration is disabled by default. Start-Live.ps1 requires explicit deployment approval and restores its loader configuration and owned plugin directories when its cleanup block runs.
 
