@@ -14,6 +14,33 @@ ctest --test-dir o/windows-msvc-release --output-on-failure
 
 Internal dependencies use shared Build.CMake and optional ignored Build.Local.cmake registrations. Windows uses x64-windows-static and static MSVC CRT. Generated artifacts stay under o/. Managed builds additionally require the configured game/reference context; see Docs/MANAGED_BUILD.md.
 
+## Platform classification overrides
+
+`platform-roles.ini` supplies explicit capabilities and primary roles when native
+classification is incomplete. `[PlatformRoles]` entries replace a type's capability
+list. `[PrimaryPlatformRoles]` entries select a single primary role independently
+of list order and override the native primary classification. An empty primary
+entry explicitly clears it; an absent entry retains the native primary role.
+A present primary role is always included in the published capability list.
+
+```ini
+[PlatformRoles]
+vessels/wp_bpk_udaloy=AntiSubmarineWarfare,SurfaceWarfare
+vessels/wp_ss_kilo=AntiSubmarineWarfare,SurfaceWarfare
+
+[PrimaryPlatformRoles]
+vessels/wp_bpk_udaloy=AntiSubmarineWarfare
+vessels/wp_ss_kilo=AntiSubmarineWarfare
+```
+
+The bundled defaults contain an explicit primary entry for every type with a
+nonempty capability list. Civilian objects, animals and static scenery can have
+no applicable platform role. Add explicit entries for custom content as needed.
+`scripts/Generate-PlatformRoleMappings.ps1 -GameRoot <path>` regenerates the file
+from native roles plus the script's authored classification policy. Regeneration
+replaces local edits: preserve any custom mappings first. Generated primary choices
+are editable policy, rather than claims about active native missions.
+
 Package targets: NavalCommand.SeaPower.Mod.PackageRuntime and NavalCommand.SeaPower.Mod.PackageHarness. Configuration is disabled by default. Start-Live.ps1 requires explicit deployment approval and restores its loader configuration and owned plugin directories when its cleanup block runs.
 
 `config.json` selects the alternative-name localization through `alternativeDisplayNames`. The package includes `alternative-display-names.en.ini` and `alternative-display-names.ru.ini`; the default is Russian, and changing the setting to the `.en.ini` file selects English display names. Both files use the same `[UnitTypes]` keys (`folder/type`), optional exact `[EquipmentTypes]` capability overrides, and native-key `[Ammunition]` and `[Systems]` mappings. Equipment names resolve exact capability overrides first, then the final native ammunition or system key. Unit names follow the matching Sea Power 8.3 encyclopedia. Equipment names are curated from game definitions and reference designations: known Soviet systems use their model/system names rather than NATO aliases or generic launcher labels, and ammunition names lead with the projectile followed by a different system in parentheses. The English catalogue uses Latin transliteration; the Russian catalogue uses Cyrillic names.

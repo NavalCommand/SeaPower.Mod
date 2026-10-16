@@ -16,7 +16,7 @@ $nativeRoleMap = @{
     Deco = @('Decoy')
     SeaMine = @('MineWarfare')
     SmallCivilian = @()
-    Merchant = @()
+    Merchant = @('Transport')
     Passenger = @('Transport')
     Transport = @('Transport')
     Landing = @('Transport')
@@ -31,10 +31,10 @@ $nativeRoleMap = @{
     NGFS = @('LandAttack')
     AAW = @('AirDefence')
     ASW = @('AntiSubmarineWarfare')
-    Carrier = @()
-    CVS = @()
-    CVL = @()
-    SS = @()
+    Carrier = @('Strike')
+    CVS = @('AntiSubmarineWarfare')
+    CVL = @('Strike')
+    SS = @('AntiSubmarineWarfare', 'SurfaceWarfare')
     SSN = @('AntiSubmarineWarfare')
     SSG = @('SurfaceWarfare')
     SSGN = @('SurfaceWarfare', 'LandAttack')
@@ -89,6 +89,50 @@ foreach ($fileName in $encyclopediaFolders.Keys) {
 }
 
 $mappings = [Collections.Generic.SortedDictionary[string, string]]::new([StringComparer]::OrdinalIgnoreCase)
+$primaryMappings = [Collections.Generic.SortedDictionary[string, string]]::new([StringComparer]::OrdinalIgnoreCase)
+# Authored default classification policy, materialized as editable INI entries.
+# This is independent of AI.Role list order and does not run in the game thread.
+$principalTypeRoles = @{
+    'AEW&C' = 'AirborneEarlyWarning'
+    'EW Aircraft' = 'ElectronicWarfare'
+    'EW/Tanker' = 'ElectronicWarfare'
+    'Fighter' = 'AirSuperiority'
+    'Fighter Bomber' = 'AirSuperiority'
+    'Interceptor' = 'AirSuperiority'
+    'VTOL,Fighter' = 'AirSuperiority'
+    'Attack' = 'Strike'
+    'Attack Helicopter' = 'Strike'
+    'Bomber' = 'LandAttack'
+    'Bomber,Strategic Bomber' = 'LandAttack'
+    'ASW Aircraft' = 'AntiSubmarineWarfare'
+    'ASW Helicopter' = 'AntiSubmarineWarfare'
+    'Maritime Patrol,MPA' = 'MaritimePatrol'
+    'MPA Helicopter' = 'MaritimePatrol'
+    'Recon' = 'Reconnaissance'
+    'Tanker' = 'AerialRefuelling'
+    'Transport' = 'Transport'
+    'VIP Transport' = 'Transport'
+    'Heavy Lift Helicopter' = 'Transport'
+    'Medium Lift Helicopter' = 'Transport'
+}
+$shipDesignationRoles = @{
+    CG = 'GuidedMissile'
+    BPK = 'AntiSubmarineWarfare'
+    SS = 'AntiSubmarineWarfare'
+    SSN = 'AntiSubmarineWarfare'
+    SSG = 'SurfaceWarfare'
+    SSGN = 'SurfaceWarfare'
+    SSB = 'Strike'
+    SSBN = 'Strike'
+    CV = 'Strike'
+    CVN = 'Strike'
+    CVL = 'Strike'
+    CVS = 'AntiSubmarineWarfare'
+    PKR = 'AntiSubmarineWarfare'
+}
+$defaultRolePriority = @('Decoy', 'AirborneEarlyWarning', 'ElectronicWarfare', 'AirSuperiority', 'MaritimePatrol',
+    'AirDefence', 'AntiSubmarineWarfare', 'SurfaceWarfare', 'MineWarfare', 'LandAttack', 'Strike',
+    'AerialRefuelling', 'Reconnaissance', 'Surveillance', 'Transport')
 $typeFiles = Get-ChildItem -LiteralPath $originalContent -Recurse -File -Filter '*.ini' |
     Where-Object { $_.Directory.Name -in @('aircraft', 'vessels', 'land_units', 'biologic') }
 foreach ($file in $typeFiles) {
@@ -107,10 +151,6 @@ foreach ($file in $typeFiles) {
             }
         }
     }
-    if ($nativeRoles.Count -eq 0) {
-        continue
-    }
-
     $roles = [Collections.Generic.List[string]]::new()
     foreach ($nativeRole in $nativeRoles) {
         foreach ($role in $nativeRoleMap[$nativeRole]) {
@@ -121,9 +161,40 @@ foreach ($file in $typeFiles) {
     }
     $relativeFolder = [IO.Path]::GetRelativePath($originalContent, $file.DirectoryName).Replace('\', '/')
     $typeId = ($relativeFolder + '/' + $file.BaseName).ToLowerInvariant()
+    if ($nativeRoles.Count -eq 0 -and !$encyclopediaTypes.ContainsKey($typeId)) {
+        # Variant fragments and other supporting INIs are not platform definitions.
+        continue
+    }
     if ($relativeFolder -eq 'biologic' -and $encyclopediaTypes[$typeId] -match 'Whale') {
         # AI.Role is a simulation concern; an encyclopedia-listed animal is not a military platform.
         $roles.Clear()
+    }
+    $principalRole = $null
+    $encyclopediaType = $encyclopediaTypes[$typeId]
+    if ($encyclopediaType) {
+        if ($relativeFolder -eq 'aircraft' -and $principalTypeRoles.ContainsKey($encyclopediaType)) {
+            $principalRole = $principalTypeRoles[$encyclopediaType]
+        }
+        elseif ($relativeFolder -eq 'vessels') {
+            $designation = $encyclopediaType.Split(',')[0].Trim()
+            if ($shipDesignationRoles.ContainsKey($designation)) {
+                $principalRole = $shipDesignationRoles[$designation]
+            }
+        }
+    }
+    if (!$principalRole) {
+        foreach ($role in $defaultRolePriority) {
+            if ($roles.Contains($role)) {
+                $principalRole = $role
+                break
+            }
+        }
+    }
+    if ($principalRole) {
+        if (!$roles.Contains($principalRole)) {
+            $roles.Add($principalRole)
+        }
+        $primaryMappings[$typeId] = $principalRole
     }
     $entry = if ($roles.Count -eq 0) { '' } else { $roles -join ',' }
     if ($encyclopediaTypes.ContainsKey($typeId)) {
@@ -142,8 +213,15 @@ $output.Add('; Keys use the active Unit.TypeId form: <content-folder>/<INI-name>
 $output.Add('; Values are NavalCommand PlatformRole names; an empty value clears native roles.')
 $output.Add('; Entries were built from native AI.Role definitions and annotated with language_en encyclopedia Type labels when available.')
 $output.Add('; Edit or extend this file to override one type. Unlisted mod types use the built-in native-role mapping.')
+$output.Add('; [PrimaryPlatformRoles] sets one explicit primary role per type, independently of capability order.')
+$output.Add('; Generated primary choices are editable classification policy, not native mission assignments.')
 $output.Add('[PlatformRoles]')
 foreach ($entry in $mappings.GetEnumerator()) {
+    $output.Add($entry.Key + '=' + $entry.Value)
+}
+$output.Add('')
+$output.Add('[PrimaryPlatformRoles]')
+foreach ($entry in $primaryMappings.GetEnumerator()) {
     $output.Add($entry.Key + '=' + $entry.Value)
 }
 

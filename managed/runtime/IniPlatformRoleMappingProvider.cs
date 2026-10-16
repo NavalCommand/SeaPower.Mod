@@ -8,6 +8,7 @@ namespace NavalCommand.SeaPower.Mod;
 internal sealed class IniPlatformRoleMappingProvider : IPlatformRoleMappingProvider
 {
     readonly Dictionary<string, IReadOnlyCollection<PlatformRole>> roleMappings = new(StringComparer.OrdinalIgnoreCase);
+    readonly Dictionary<string, PlatformRole?> primaryRoleMappings = new(StringComparer.OrdinalIgnoreCase);
 
     public IniPlatformRoleMappingProvider(string filePath)
     {
@@ -40,15 +41,16 @@ internal sealed class IniPlatformRoleMappingProvider : IPlatformRoleMappingProvi
             if (line.StartsWith("[", StringComparison.Ordinal) && line.EndsWith("]", StringComparison.Ordinal))
             {
                 section = line.Substring(1, line.Length - 2).Trim();
-                if (!string.Equals(section, "PlatformRoles", StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(section, "PlatformRoles", StringComparison.OrdinalIgnoreCase)
+                    && !string.Equals(section, "PrimaryPlatformRoles", StringComparison.OrdinalIgnoreCase))
                 {
                     throw InvalidLine(lineNumber, "unsupported section " + section);
                 }
                 continue;
             }
-            if (!string.Equals(section, "PlatformRoles", StringComparison.OrdinalIgnoreCase))
+            if (section.Length == 0)
             {
-                throw InvalidLine(lineNumber, "mapping is outside [PlatformRoles]");
+                throw InvalidLine(lineNumber, "mapping is outside a role section");
             }
 
             int separatorIndex = line.IndexOf('=');
@@ -82,20 +84,36 @@ internal sealed class IniPlatformRoleMappingProvider : IPlatformRoleMappingProvi
                     roles.Add(role);
                 }
             }
-            if (!roleMappings.TryAdd(typeId, roles.AsReadOnly()))
+            if (string.Equals(section, "PrimaryPlatformRoles", StringComparison.OrdinalIgnoreCase))
+            {
+                if (roles.Count > 1)
+                {
+                    throw InvalidLine(lineNumber, "a primary platform role must be a single role or empty");
+                }
+                if (!primaryRoleMappings.TryAdd(typeId, roles.Count == 0 ? null : roles[0]))
+                {
+                    throw InvalidLine(lineNumber, "duplicate primary role type ID " + typeId);
+                }
+            }
+            else if (!roleMappings.TryAdd(typeId, roles.AsReadOnly()))
             {
                 throw InvalidLine(lineNumber, "duplicate type ID " + typeId);
             }
         }
-        if (roleMappings.Count == 0)
+        if (roleMappings.Count == 0 && primaryRoleMappings.Count == 0)
         {
-            throw new InvalidDataException("Platform role mapping file contains no [PlatformRoles] entries.");
+            throw new InvalidDataException("Platform role mapping file contains no role entries.");
         }
     }
 
     public bool TryGetRoles(string typeId, out IReadOnlyCollection<PlatformRole> roles)
     {
         return roleMappings.TryGetValue(typeId ?? "", out roles);
+    }
+
+    public bool TryGetPrimaryRole(string typeId, out PlatformRole? role)
+    {
+        return primaryRoleMappings.TryGetValue(typeId ?? "", out role);
     }
 
     static bool IsTypeId(string typeId)

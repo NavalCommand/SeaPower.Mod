@@ -6,6 +6,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="../../platform-roles.ini" Link="platform-roles.ini" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="Program.cs" />
     <Compile Include="../../managed/runtime/RuntimeConfiguration.cs" />
     <Compile Include="../../managed/runtime/RuntimeMailbox.cs" />

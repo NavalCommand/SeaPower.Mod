@@ -23,12 +23,59 @@ var configuration = RuntimeConfiguration.Load(directory);
 configuration.LogDirectory = directory;
 Check(configuration.Abi == 2 && !configuration.Enabled, "explicit version and disabled deployment default");
 Check(configuration.ClassificationMode == "safe" && configuration.PlatformRoleMappingsPath == Path.Combine(directory, "platform-roles.ini"), "safe classification and mapping path defaults");
-File.WriteAllText(Path.Combine(directory, "platform-roles.ini"), "[PlatformRoles]\nvessels/example=SurfaceWarfare,AntiSubmarineWarfare\nvessels/unarmed=\n");
+File.WriteAllText(Path.Combine(directory, "platform-roles.ini"), "[PlatformRoles]\nvessels/example=SurfaceWarfare,AntiSubmarineWarfare\nvessels/unarmed=\n[PrimaryPlatformRoles]\nvessels/example=AntiSubmarineWarfare\nvessels/unarmed=\n");
 var mappings = new IniPlatformRoleMappingProvider(Path.Combine(directory, "platform-roles.ini"));
 Check(mappings.TryGetRoles("vessels/example", out var mappedRoles)
     && mappedRoles.Count == 2 && mappedRoles.Contains(PlatformRole.SurfaceWarfare), "INI role map resolves typed role overrides");
 Check(mappings.TryGetRoles("vessels/unarmed", out var emptyRoles) && emptyRoles.Count == 0, "empty INI mapping removes all platform roles");
 Check(!mappings.TryGetRoles("vessels/unmapped", out _), "unmapped type uses native role defaults");
+Check(mappings.TryGetPrimaryRole("vessels/example", out var primaryRole) && primaryRole == PlatformRole.AntiSubmarineWarfare,
+    "primary role is configured independently of capability order");
+Check(mappings.TryGetPrimaryRole("vessels/unarmed", out var clearedPrimary) && clearedPrimary == null,
+    "empty primary entry explicitly clears the native primary role");
+Check(!mappings.TryGetPrimaryRole("vessels/unmapped", out _), "unmapped primary role retains the native default");
+string defaultMappingPath = Path.Combine(AppContext.BaseDirectory, "platform-roles.ini");
+var defaults = new IniPlatformRoleMappingProvider(defaultMappingPath);
+foreach (string configuredType in new[] { "vessels/wp_bpk_udaloy", "vessels/wp_ss_kilo" })
+{
+    Check(defaults.TryGetRoles(configuredType, out var capabilities) && capabilities.Contains(PlatformRole.AntiSubmarineWarfare),
+        "reported ASW platform has configured capabilities");
+    Check(defaults.TryGetPrimaryRole(configuredType, out var principalRole) && principalRole == PlatformRole.AntiSubmarineWarfare,
+        "reported ASW platform has an explicit configured primary role");
+}
+string mappingSection = "";
+foreach (string rawLine in File.ReadLines(defaultMappingPath))
+{
+    string line = rawLine.Split(';')[0].Trim();
+    if (line.StartsWith("[", StringComparison.Ordinal))
+    {
+        mappingSection = line;
+    }
+    else if (mappingSection == "[PlatformRoles]" && line.Contains('='))
+    {
+        string typeId = line.Substring(0, line.IndexOf('='));
+        Check(defaults.TryGetRoles(typeId, out var capabilities), "default entry parses");
+        if (capabilities.Count > 0)
+        {
+            Check(defaults.TryGetPrimaryRole(typeId, out var principalRole) && principalRole.HasValue && capabilities.Contains(principalRole.Value),
+                "every default type with platform roles has an explicit primary role in its capabilities: " + typeId);
+        }
+    }
+}
+foreach (string invalidPrimary in new[] { "SurfaceWarfare,AirDefence", "NotARole", "0" })
+{
+    File.WriteAllText(Path.Combine(directory, "platform-roles.ini"), "[PrimaryPlatformRoles]\nvessels/example=" + invalidPrimary + "\n");
+    bool rejected = false;
+    try
+    {
+        _ = new IniPlatformRoleMappingProvider(Path.Combine(directory, "platform-roles.ini"));
+    }
+    catch (InvalidDataException)
+    {
+        rejected = true;
+    }
+    Check(rejected, "invalid primary role is rejected");
+}
 File.WriteAllText(Path.Combine(directory, "platform-roles.ini"), "[PlatformRoles]\nvessels/example=NotARole\n");
 bool invalidRoleRejected = false;
 try
